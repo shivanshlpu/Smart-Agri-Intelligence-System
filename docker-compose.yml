@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: agri-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  ml-server:
+    build: ./ml-server
+    container_name: agri-ml
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml-server:/app
+    environment:
+      - ML_PORT=8000
+      - FLASK_ENV=production
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: agri-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/agri_db
+      - ML_SERVER_URL=http://ml-server:8000
+      - JWT_SECRET=anti_gravity_agri_secret_2024
+      - PORT=5000
+    depends_on:
+      - mongo
+      - ml-server
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: agri-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
