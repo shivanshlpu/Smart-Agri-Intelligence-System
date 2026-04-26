@@ -12,9 +12,25 @@ function getLossRecommendations(level) {
 }
 
 function getPriceRecommendations(price, crop) {
-  if (price > 3000) return [`Good time to sell ${crop} — prices are high.`, "Consider forward contracts to lock in current rates.", "Explore export opportunities via APEDA."];
-  if (price > 1500) return [`Market prices for ${crop} are moderate.`, "Monitor for 1-2 weeks before selling.", "Consider value-added processing."];
-  return [`Low price period for ${crop}.`, "Store if possible and wait for better market.", "Explore government procurement (MSP) options.", "Register on e-NAM portal for better price discovery."];
+  if (price > 3000) {
+    return {
+      trend: "up",
+      en: [`Good time to sell ${crop} (Prices are high)`, "Consider forward contracts to lock in current rates.", "Explore export opportunities via APEDA."],
+      hi: [`यह ${crop} बेचने का सही समय है (कीमत अधिक है)`, "वर्तमान दरों को पक्का करने के लिए फॉरवर्ड एग्रीमेंट पर विचार करें।", "निर्यात (export) के अवसर खोजें।"]
+    };
+  }
+  if (price > 1500) {
+    return {
+      trend: "stable",
+      en: [`Market prices for ${crop} are moderate`, "Monitor for 1-2 weeks before selling.", "Consider value-added processing."],
+      hi: [`${crop} की बाजार कीमत सामान्य है`, "बेचने से पहले 1-2 सप्ताह तक प्रतीक्षा करें।", "फसल को प्रोसेस करके बेचने पर विचार करें।"]
+    };
+  }
+  return {
+    trend: "down",
+    en: [`Low price period for ${crop}`, "Store if possible and wait for better market.", "Explore government procurement (MSP) options."],
+    hi: [`${crop} की कीमत अभी कम है`, "यदि संभव हो तो सुरक्षित रखें और बेहतर बाजार की प्रतीक्षा करें।", "सरकारी खरीद (MSP) विकल्पों का उपयोग करें।"]
+  };
 }
 
 function getSupplyRecommendations(efficiency) {
@@ -64,6 +80,9 @@ exports.getLossPrediction = async (req, res, next) => {
 exports.getPricePrediction = async (req, res, next) => {
   try {
     const { data } = await predictPrice(req.body);
+    if (data.predicted_price !== undefined) {
+      data.predicted_price = Math.max(0, Math.round(data.predicted_price));
+    }
     const recommendations = getPriceRecommendations(data.predicted_price, req.body.crop_type);
 
     let saved = null;
