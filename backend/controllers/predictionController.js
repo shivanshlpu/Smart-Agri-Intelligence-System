@@ -48,7 +48,13 @@ exports.getLossPrediction = async (req, res, next) => {
     res.json({ ...data, id: saved?._id, recommendations });
   } catch (err) {
     if (err.code === "ECONNREFUSED" || err.code === "ECONNRESET") {
-      return res.status(503).json({ error: "ML Server is not running. Start with: cd ml-server && python app.py" });
+      return res.status(503).json({ error: "ML Server connection refused. Make sure ML_SERVER_URL is correct on Render." });
+    }
+    if (err.code === "ECONNABORTED") {
+      return res.status(504).json({ error: "ML Server timed out. It might be waking up (takes ~50s on free Render). Try again in a minute." });
+    }
+    if (err.response) {
+      return res.status(502).json({ error: `ML Server returned an error: ${err.response.status}` });
     }
     next(err);
   }
@@ -75,7 +81,13 @@ exports.getPricePrediction = async (req, res, next) => {
     res.json({ ...data, id: saved?._id, recommendations });
   } catch (err) {
     if (err.code === "ECONNREFUSED" || err.code === "ECONNRESET") {
-      return res.status(503).json({ error: "ML Server is not running. Start with: cd ml-server && python app.py" });
+      return res.status(503).json({ error: "ML Server connection refused. Make sure ML_SERVER_URL is correct on Render." });
+    }
+    if (err.code === "ECONNABORTED") {
+      return res.status(504).json({ error: "ML Server timed out. It might be waking up (takes ~50s on free Render). Try again in a minute." });
+    }
+    if (err.response) {
+      return res.status(502).json({ error: `ML Server returned an error: ${err.response.status}` });
     }
     next(err);
   }
@@ -102,7 +114,13 @@ exports.getSupplyPrediction = async (req, res, next) => {
     res.json({ ...data, id: saved?._id, recommendations });
   } catch (err) {
     if (err.code === "ECONNREFUSED" || err.code === "ECONNRESET") {
-      return res.status(503).json({ error: "ML Server is not running. Start with: cd ml-server && python app.py" });
+      return res.status(503).json({ error: "ML Server connection refused. Make sure ML_SERVER_URL is correct on Render." });
+    }
+    if (err.code === "ECONNABORTED") {
+      return res.status(504).json({ error: "ML Server timed out. It might be waking up (takes ~50s on free Render). Try again in a minute." });
+    }
+    if (err.response) {
+      return res.status(502).json({ error: `ML Server returned an error: ${err.response.status}` });
     }
     next(err);
   }
