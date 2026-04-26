@@ -20,6 +20,7 @@ export default function Home() {
   const [weather, setWeather]     = useState(null);
   const [mandiPrices, setMandiPrices] = useState([]);
   const [mandiLoading, setMandiLoading] = useState(true);
+  const [showAllMandi, setShowAllMandi] = useState(false);
 
   useEffect(() => {
     // Fetch stats & recent history from backend
@@ -77,7 +78,7 @@ export default function Home() {
     const mandiUrl = import.meta.env.VITE_DATA_GOV_MANDI_URL;
     if (govKey && govKey !== "your_data_gov_in_api_key_here" && mandiUrl) {
       const userState = user?.location?.state || "Uttar Pradesh";
-      fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=15&filters[State.keyword]=${userState}`)
+      fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=50&filters[State.keyword]=${userState}`)
         .then(r => r.json())
         .then(d => {
           if (d.records && d.records.length > 0) {
@@ -107,14 +108,21 @@ export default function Home() {
   function getDemoMandiPrices() {
     const city = user?.location?.district || "Lucknow";
     const state = user?.location?.state || "UP";
-    return [
-      { crop: "Wheat",     market: city, state: state, minPrice: 2100, maxPrice: 2350, modalPrice: 2225, date: "Indicative" },
-      { crop: "Rice",      market: city, state: state, minPrice: 1850, maxPrice: 2050, modalPrice: 1960, date: "Indicative" },
-      { crop: "Tomato",    market: city, state: state, minPrice: 700,  maxPrice: 1000, modalPrice: 850,  date: "Indicative" },
-      { crop: "Onion",     market: city, state: state, minPrice: 1000, maxPrice: 1400, modalPrice: 1210, date: "Indicative" },
-      { crop: "Potato",    market: city, state: state, minPrice: 500,  maxPrice: 750,  modalPrice: 625,  date: "Indicative" },
-      { crop: "Maize",     market: city, state: state, minPrice: 1700, maxPrice: 1950, modalPrice: 1820, date: "Indicative" },
+    const ALL_CROPS = [
+      { c: "Wheat", min: 2100, max: 2350 }, { c: "Rice", min: 1850, max: 2050 }, { c: "Tomato", min: 700, max: 1000 },
+      { c: "Onion", min: 1000, max: 1400 }, { c: "Potato", min: 500, max: 750 }, { c: "Maize", min: 1700, max: 1950 },
+      { c: "Sugarcane", min: 280, max: 350 }, { c: "Cotton", min: 6500, max: 7200 }, { c: "Soybean", min: 4200, max: 4800 },
+      { c: "Groundnut", min: 5500, max: 6200 }, { c: "Bajra", min: 1800, max: 2100 }, { c: "Jowar", min: 2300, max: 2700 },
+      { c: "Barley", min: 1900, max: 2200 }, { c: "Mustard", min: 5000, max: 5600 }, { c: "Mango", min: 3000, max: 5000 },
+      { c: "Apple", min: 6000, max: 8000 }, { c: "Banana", min: 1200, max: 1800 }, { c: "Chickpea", min: 4500, max: 5200 },
+      { c: "Lentil", min: 5800, max: 6500 }, { c: "Turmeric", min: 7000, max: 8500 }, { c: "Chilli", min: 12000, max: 15000 },
+      { c: "Ginger", min: 4000, max: 6000 }, { c: "Garlic", min: 8000, max: 12000 }, { c: "Coffee", min: 15000, max: 20000 },
+      { c: "Tea", min: 10000, max: 18000 }, { c: "Millet", min: 2000, max: 2500 }, { c: "Watermelon", min: 800, max: 1500 }
     ];
+    return ALL_CROPS.map(cr => ({
+      crop: cr.c, market: city, state: state, minPrice: cr.min, maxPrice: cr.max, 
+      modalPrice: Math.floor((cr.min + cr.max) / 2), date: "Indicative"
+    }));
   }
 
   const typeCount = (type) =>
@@ -275,11 +283,18 @@ export default function Home() {
 
       {/* Live Mandi Prices from data.gov.in */}
       <div className="card" style={{ marginBottom: 18 }}>
-        <div className="card-header">
-          <h3>🏪 Live Mandi Prices (₹/Quintal)</h3>
-          <span className="badge badge-blue" style={{ fontSize: 10 }}>
-            {mandiPrices[0]?.date === "Indicative" ? "Indicative" : "data.gov.in API"}
-          </span>
+        <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <h3 style={{ margin: 0 }}>🏪 Live Mandi Prices (₹/Quintal)</h3>
+            <span className="badge badge-blue" style={{ fontSize: 10 }}>
+              {mandiPrices[0]?.date === "Indicative" ? "Indicative" : "data.gov.in API"}
+            </span>
+          </div>
+          {mandiPrices.length > 5 && (
+            <button className="btn btn-outline btn-sm" onClick={() => setShowAllMandi(!showAllMandi)}>
+              {showAllMandi ? "View Less" : "View All →"}
+            </button>
+          )}
         </div>
         <div className="card-body" style={{ padding: 0 }}>
           {mandiLoading ? (
@@ -299,7 +314,7 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mandiPrices.map((p, i) => (
+                  {(showAllMandi ? mandiPrices : mandiPrices.slice(0, 5)).map((p, i) => (
                     <tr key={i}>
                       <td style={{ fontWeight: 600 }}>{p.crop}</td>
                       <td>{p.market}</td>
