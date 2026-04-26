@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../api/axiosConfig";
 import { toast } from "react-toastify";
 import LossGauge from "../components/Charts/LossGauge";
@@ -24,6 +24,58 @@ export default function PredictLoss() {
   const [form, setForm]     = useState(INIT);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetchingWeather, setFetchingWeather] = useState(false);
+
+  useEffect(() => {
+    // Attempt to auto-fetch weather on mount
+    fetchWeatherWithGPS(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchWeatherWithGPS = (silent = false) => {
+    if (!navigator.geolocation) {
+      if (!silent) toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+    
+    setFetchingWeather(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const weatherKey = import.meta.env.VITE_WEATHER_API_KEY;
+          
+          if (weatherKey && weatherKey !== "your_openweathermap_api_key_here") {
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${weatherKey}`);
+            const data = await res.json();
+            if (data.main) {
+              setForm(prev => ({
+                ...prev,
+                temperature: Math.round(data.main.temp),
+                humidity: data.main.humidity
+              }));
+              if (!silent) toast.success("Auto-filled weather from your GPS location!");
+            } else if (!silent) {
+              toast.error("Could not fetch weather data for your location.");
+            }
+          } else if (!silent) {
+            toast.error("Weather API key is not configured.");
+          }
+        } catch (error) {
+          console.error("Weather fetch error", error);
+          if (!silent) toast.error("Failed to fetch weather data.");
+        } finally {
+          setFetchingWeather(false);
+        }
+      },
+      (error) => {
+        console.warn("Geolocation denied or error:", error);
+        if (!silent) toast.warning("Could not get your location. Please enter weather manually.");
+        setFetchingWeather(false);
+      }
+    );
+  };
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -68,8 +120,13 @@ export default function PredictLoss() {
         {/* Input Form */}
         <div>
           <div className="form-section">
-            <div className="form-section-header">
-              📋 Crop, Weather & Soil Information
+            <div className="form-section-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>📋 Crop, Weather & Soil Information</span>
+              <button type="button" className="btn btn-sm btn-outline" 
+                onClick={() => fetchWeatherWithGPS(false)} disabled={fetchingWeather}
+                style={{ padding: "4px 8px", fontSize: 12 }}>
+                {fetchingWeather ? "📍 Fetching..." : "📍 Use My GPS Location"}
+              </button>
             </div>
             <div className="form-body">
               <form onSubmit={submit}>
