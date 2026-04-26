@@ -39,8 +39,8 @@ export default function Home() {
     // ─── LIVE WEATHER from OpenWeatherMap API ─────────────────
     const weatherKey = import.meta.env.VITE_WEATHER_API_KEY;
     if (weatherKey && weatherKey !== "your_openweathermap_api_key_here") {
-      // Default: Lucknow, UP (user's likely location)
-      fetch(`https://api.openweathermap.org/data/2.5/weather?q=Lucknow,IN&units=metric&appid=${weatherKey}`)
+      const userCity = user?.location?.district || "Lucknow";
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${userCity},IN&units=metric&appid=${weatherKey}`)
         .then(r => r.json())
         .then(d => {
           if (d.main) {
@@ -50,7 +50,7 @@ export default function Home() {
               desc: d.weather?.[0]?.description || "",
               icon: d.weather?.[0]?.icon,
               wind: d.wind?.speed || 0,
-              city: d.name || "Lucknow",
+              city: d.name || userCity,
             });
           }
         })
@@ -65,7 +65,7 @@ export default function Home() {
                   humidity: null,
                   desc: `Wind: ${d.current_weather.windspeed} km/h`,
                   wind: d.current_weather.windspeed,
-                  city: "Lucknow",
+                  city: userCity,
                 });
               }
             }).catch(() => {});
@@ -76,14 +76,15 @@ export default function Home() {
     const govKey = import.meta.env.VITE_DATA_GOV_API_KEY;
     const mandiUrl = import.meta.env.VITE_DATA_GOV_MANDI_URL;
     if (govKey && govKey !== "your_data_gov_in_api_key_here" && mandiUrl) {
-      fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=15&filters[State.keyword]=Uttar Pradesh`)
+      const userState = user?.location?.state || "Uttar Pradesh";
+      fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=15&filters[State.keyword]=${userState}`)
         .then(r => r.json())
         .then(d => {
           if (d.records && d.records.length > 0) {
             const prices = d.records.map(r => ({
               crop:    r.Commodity || r.commodity || "—",
               market:  r.Market || r.market || r["Market Name"] || "—",
-              state:   r.State || r.state || "UP",
+              state:   r.State || r.state || userState,
               minPrice:  Number(r.Min_Price || r.min_price || 0),
               maxPrice:  Number(r.Max_Price || r.max_price || 0),
               modalPrice: Number(r.Modal_Price || r.modal_price || 0),
@@ -104,13 +105,15 @@ export default function Home() {
   }, []);
 
   function getDemoMandiPrices() {
+    const city = user?.location?.district || "Lucknow";
+    const state = user?.location?.state || "UP";
     return [
-      { crop: "Wheat",     market: "Lucknow", state: "UP", minPrice: 2100, maxPrice: 2350, modalPrice: 2225, date: "Indicative" },
-      { crop: "Rice",      market: "Lucknow", state: "UP", minPrice: 1850, maxPrice: 2050, modalPrice: 1960, date: "Indicative" },
-      { crop: "Tomato",    market: "Lucknow", state: "UP", minPrice: 700,  maxPrice: 1000, modalPrice: 850,  date: "Indicative" },
-      { crop: "Onion",     market: "Lucknow", state: "UP", minPrice: 1000, maxPrice: 1400, modalPrice: 1210, date: "Indicative" },
-      { crop: "Potato",    market: "Lucknow", state: "UP", minPrice: 500,  maxPrice: 750,  modalPrice: 625,  date: "Indicative" },
-      { crop: "Maize",     market: "Lucknow", state: "UP", minPrice: 1700, maxPrice: 1950, modalPrice: 1820, date: "Indicative" },
+      { crop: "Wheat",     market: city, state: state, minPrice: 2100, maxPrice: 2350, modalPrice: 2225, date: "Indicative" },
+      { crop: "Rice",      market: city, state: state, minPrice: 1850, maxPrice: 2050, modalPrice: 1960, date: "Indicative" },
+      { crop: "Tomato",    market: city, state: state, minPrice: 700,  maxPrice: 1000, modalPrice: 850,  date: "Indicative" },
+      { crop: "Onion",     market: city, state: state, minPrice: 1000, maxPrice: 1400, modalPrice: 1210, date: "Indicative" },
+      { crop: "Potato",    market: city, state: state, minPrice: 500,  maxPrice: 750,  modalPrice: 625,  date: "Indicative" },
+      { crop: "Maize",     market: city, state: state, minPrice: 1700, maxPrice: 1950, modalPrice: 1820, date: "Indicative" },
     ];
   }
 
