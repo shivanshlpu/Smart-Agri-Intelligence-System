@@ -1,18 +1,13 @@
 import { useState, useEffect } from "react";
 import API from "../api/axiosConfig";
+import { useLang } from "../context/LanguageContext";
 import { toast } from "react-toastify";
-import LossGauge from "../components/Charts/LossGauge";
+import LossResult from "../components/Charts/LossResult";
 import RecommendationCard from "../components/RecommendationCard";
 
 const CROPS = ["Wheat","Rice","Tomato","Onion","Potato","Maize","Sugarcane","Cotton",
   "Soybean","Groundnut","Bajra","Jowar","Barley","Mustard","Mango","Apple",
   "Banana","Chickpea","Lentil","Jute","Coffee","Tea","Millet","Watermelon"];
-const STORAGE_OPTIONS = [
-  { label: "None / No Disease", value: "None" },
-  { label: "Mild Stress", value: "Mild" },
-  { label: "Moderate Stress", value: "Moderate" },
-  { label: "Severe Stress / Open Shed", value: "Severe" },
-];
 
 const INIT = {
   crop_type: "Wheat", temperature: "", humidity: "", rainfall: "",
@@ -21,6 +16,7 @@ const INIT = {
 };
 
 export default function PredictLoss() {
+  const { t } = useLang();
   const [form, setForm]     = useState(INIT);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +51,7 @@ export default function PredictLoss() {
                 temperature: Math.round(data.main.temp),
                 humidity: data.main.humidity
               }));
-              if (!silent) toast.success("Auto-filled weather from your GPS location!");
+              if (!silent) toast.success("✅ Auto-filled weather from your location!");
             } else if (!silent) {
               toast.error("Could not fetch weather data for your location.");
             }
@@ -98,7 +94,7 @@ export default function PredictLoss() {
         potassium:         Number(form.potassium),
       });
       setResult(data);
-      toast.success(`Prediction complete: ${data.prediction} Risk detected.`);
+      toast.success(`✅ ${data.prediction}`);
     } catch (err) {
       toast.error(err.response?.data?.error || "Prediction failed. Check ML Server.");
     } finally { setLoading(false); }
@@ -110,9 +106,9 @@ export default function PredictLoss() {
     <div className="page-wrapper">
       <div className="page-header">
         <div>
-          <div className="breadcrumb">🏠 Dashboard › <span>Crop Loss Prediction</span></div>
-          <h1>🌿 Post-Harvest Loss Prediction</h1>
-          <p>Enter crop, weather, and soil details to predict post-harvest loss risk using RandomForest ML model.</p>
+          <div className="breadcrumb">🏠 {t("nav.dashboard")} › <span>{t("nav.loss")}</span></div>
+          <h1>{t("loss.title")}</h1>
+          <p>{t("loss.subtitle")}</p>
         </div>
       </div>
 
@@ -121,18 +117,18 @@ export default function PredictLoss() {
         <div>
           <div className="form-section">
             <div className="form-section-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span>📋 Crop, Weather & Soil Information</span>
+              <span>{t("loss.formTitle")}</span>
               <button type="button" className="btn btn-sm btn-outline" 
                 onClick={() => fetchWeatherWithGPS(false)} disabled={fetchingWeather}
-                style={{ padding: "4px 8px", fontSize: 12 }}>
-                {fetchingWeather ? "📍 Fetching..." : "📍 Use My GPS Location"}
+                style={{ padding: "4px 8px", fontSize: 12, color: "white", borderColor: "rgba(255,255,255,0.4)" }}>
+                {fetchingWeather ? t("loss.gpsFetching") : t("loss.gpsBtn")}
               </button>
             </div>
             <div className="form-body">
               <form onSubmit={submit}>
                 <div className="form-grid">
                   <div className="form-group">
-                    <label>Crop Type / Fasal <span className="required">*</span></label>
+                    <label>{t("loss.cropType")} <span className="required">*</span></label>
                     <select id="loss-crop" name="crop_type" className="form-control"
                       value={form.crop_type} onChange={handle} required>
                       {CROPS.map(c => <option key={c}>{c}</option>)}
@@ -140,66 +136,68 @@ export default function PredictLoss() {
                   </div>
 
                   <div className="form-group">
-                    <label>Crop Stress Level <span className="required">*</span></label>
+                    <label>{t("loss.stressLevel")} <span className="required">*</span></label>
                     <select id="loss-storage" name="storage_condition" className="form-control"
                       value={form.storage_condition} onChange={handle}>
-                      {STORAGE_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                      <option value="None">{t("loss.stressNone")}</option>
+                      <option value="Mild">{t("loss.stressMild")}</option>
+                      <option value="Moderate">{t("loss.stressMod")}</option>
+                      <option value="Severe">{t("loss.stressSevere")}</option>
                     </select>
-                    <span className="form-hint">Disease/storage stress condition</span>
                   </div>
 
                   <div className="form-group">
-                    <label>Temperature (°C) <span className="required">*</span></label>
+                    <label>{t("loss.temp")} <span className="required">*</span></label>
                     <input id="loss-temp" name="temperature" type="number" step="0.1" className="form-control"
                       placeholder="e.g. 28.5" min={-10} max={55} value={form.temperature} onChange={handle} required />
                   </div>
 
                   <div className="form-group">
-                    <label>Humidity (%) <span className="required">*</span></label>
+                    <label>{t("loss.humidity")} <span className="required">*</span></label>
                     <input id="loss-humidity" name="humidity" type="number" step="0.1" className="form-control"
                       placeholder="e.g. 65" min={0} max={100} value={form.humidity} onChange={handle} required />
                   </div>
 
                   <div className="form-group">
-                    <label>Rainfall (mm) <span className="required">*</span></label>
+                    <label>{t("loss.rainfall")} <span className="required">*</span></label>
                     <input id="loss-rainfall" name="rainfall" type="number" step="0.1" className="form-control"
                       placeholder="e.g. 120" min={0} max={1000} value={form.rainfall} onChange={handle} required />
                   </div>
 
                   <div className="form-group">
-                    <label>Soil pH</label>
+                    <label>{t("loss.soilPh")}</label>
                     <input id="loss-ph" name="ph" type="number" step="0.01" className="form-control"
                       placeholder="e.g. 6.5" min={0} max={14} value={form.ph} onChange={handle} />
-                    <span className="form-hint">Ideal: 5.5 – 7.5</span>
+                    <span className="form-hint">{t("loss.phHint")}</span>
                   </div>
 
                   <div className="form-group">
-                    <label>Soil Moisture (%)</label>
+                    <label>{t("loss.soilMoisture")}</label>
                     <input id="loss-moisture" name="soil_moisture" type="number" step="0.1" className="form-control"
                       placeholder="e.g. 30" min={0} max={100} value={form.soil_moisture} onChange={handle} />
                   </div>
 
                   <div className="form-group">
-                    <label>NDVI Index</label>
+                    <label>{t("loss.greenness")}</label>
                     <input id="loss-ndvi" name="ndvi" type="number" step="0.01" className="form-control"
                       placeholder="e.g. 0.55" min={0} max={1} value={form.ndvi} onChange={handle} />
-                    <span className="form-hint">Vegetation health: 0=dead, 1=healthy</span>
+                    <span className="form-hint">{t("loss.greennessHint")}</span>
                   </div>
 
                   <div className="form-group">
-                    <label>Nitrogen (N) kg/ha</label>
+                    <label>{t("loss.nitrogen")}</label>
                     <input id="loss-n" name="nitrogen" type="number" className="form-control"
                       placeholder="e.g. 50" min={0} max={200} value={form.nitrogen} onChange={handle} />
                   </div>
 
                   <div className="form-group">
-                    <label>Phosphorus (P) kg/ha</label>
+                    <label>{t("loss.phosphorus")}</label>
                     <input id="loss-p" name="phosphorus" type="number" className="form-control"
                       placeholder="e.g. 40" min={0} max={200} value={form.phosphorus} onChange={handle} />
                   </div>
 
                   <div className="form-group">
-                    <label>Potassium (K) kg/ha</label>
+                    <label>{t("loss.potassium")}</label>
                     <input id="loss-k" name="potassium" type="number" className="form-control"
                       placeholder="e.g. 40" min={0} max={200} value={form.potassium} onChange={handle} />
                   </div>
@@ -208,20 +206,16 @@ export default function PredictLoss() {
                 <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
                   <button id="btn-predict-loss" type="submit" className="btn btn-success btn-lg"
                     disabled={loading} style={{ flex: 1 }}>
-                    {loading ? "Analysing..." : "🔍 Predict Loss Risk"}
+                    {loading ? t("loss.predicting") : t("loss.predictBtn")}
                   </button>
-                  <button type="button" className="btn btn-outline" onClick={reset}>Reset</button>
+                  <button type="button" className="btn btn-outline" onClick={reset}>{t("loss.reset")}</button>
                 </div>
               </form>
             </div>
           </div>
 
           <div className="alert alert-info" style={{ marginTop: 14 }}>
-            <div>
-              <strong>How this works:</strong> Model uses <strong>RandomForest</strong> classifier trained on 85,000+ real data points
-              from <em>agriculture_dataset 2.csv</em>, <em>Smart_Farming_Crop_Yield_2024.csv</em>, and <em>Crop_recommendation.csv</em>.
-              Features include crop type, weather, soil nutrients (NPK), NDVI vegetation index, and stress levels.
-            </div>
+            <div>{t("loss.howItWorks")}</div>
           </div>
         </div>
 
@@ -231,36 +225,30 @@ export default function PredictLoss() {
             <div className="card">
               <div className="card-body empty-state" style={{ padding: "50px 20px" }}>
                 <div className="icon">🌿</div>
-                <p>Fill the form and click <strong>Predict Loss Risk</strong> to get your result.</p>
+                <p>{t("loss.emptyState")}</p>
               </div>
             </div>
           )}
 
           {loading && (
             <div className="card">
-              <div className="loading-center"><div className="spinner" /><p>Running RandomForest model on 85k+ data...</p></div>
+              <div className="loading-center"><div className="spinner" /><p>{t("loss.analyzing")}</p></div>
             </div>
           )}
 
           {result && !loading && (
             <div className="fade-in">
-              <div className={`result-card risk-${result.prediction?.toLowerCase()}`}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700 }}>Prediction Result</h3>
-                  <span className={`risk-badge ${result.prediction?.toLowerCase()}`}>
-                    {result.prediction} Risk
-                  </span>
-                </div>
-                {result.note && (
-                  <div className="alert alert-warning" style={{ marginBottom: 12, fontSize: 12 }}>{result.note}</div>
-                )}
-                <div className="card" style={{ marginTop: 12 }}>
-                  <div className="card-body">
-                    <LossGauge prediction={result.prediction} probabilities={result.probabilities || []} />
-                  </div>
-                </div>
-              </div>
-              <RecommendationCard recommendations={result.recommendations} title="Government-Recommended Actions" />
+              <LossResult prediction={result.prediction} probabilities={result.probabilities || []} />
+
+              {result.note && (
+                <div className="alert alert-warning" style={{ marginTop: 12, fontSize: 12 }}>{result.note}</div>
+              )}
+
+              <RecommendationCard
+                recommendations={result.recommendations}
+                recommendations_hi={result.recommendations_hi}
+                title="rec.govActions"
+              />
             </div>
           )}
         </div>

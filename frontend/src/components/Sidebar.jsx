@@ -1,36 +1,37 @@
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-
-const navItems = [
-  {
-    section: "Overview", links: [
-      { to: "/", label: "Dashboard", icon: "🏠" },
-      { to: "/history", label: "Prediction History", icon: "📋" },
-    ]
-  },
-  {
-    section: "AI Predictions", links: [
-      { to: "/loss", label: "Crop Loss Prediction", icon: "🌿" },
-      { to: "/price", label: "Price Forecasting", icon: "💰" },
-      { to: "/supply", label: "Supply Chain Analysis", icon: "🚛" },
-    ]
-  },
-  {
-    section: "Account", links: [
-      { to: "/profile", label: "My Profile", icon: "👤" },
-    ]
-  },
-];
+import { useLang } from "../context/LanguageContext";
 
 export default function Sidebar() {
-  const { user } = useAuth();
+  const { t } = useLang();
+
+  const navItems = [
+    {
+      section: t("nav.overview"), links: [
+        { to: "/", label: t("nav.dashboard"), icon: "🏠" },
+        { to: "/history", label: t("nav.history"), icon: "📋" },
+      ]
+    },
+    {
+      section: t("nav.ai"), links: [
+        { to: "/loss", label: t("nav.loss"), icon: "🌿" },
+        { to: "/price", label: t("nav.price"), icon: "💰" },
+        { to: "/supply", label: t("nav.supply"), icon: "🚛" },
+      ]
+    },
+    {
+      section: t("nav.account"), links: [
+        { to: "/profile", label: t("nav.profile"), icon: "👤" },
+      ]
+    },
+  ];
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
         <span className="sidebar-logo-icon">🌾</span>
         <div className="sidebar-logo-text">
-          Kisan Sahayak Portal
-          <div className="sidebar-logo-sub">Smart Agri Intelligence</div>
+          {t("app.name")}
+          <div className="sidebar-logo-sub">{t("app.subtitle")}</div>
         </div>
       </div>
 
@@ -56,8 +57,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        🇮🇳 Government of India<br />
-
+        {t("app.footer")}<br />
       </div>
     </aside>
   );

@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLang } from "../context/LanguageContext";
 import API from "../api/axiosConfig";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-
-const QUICK_ACTIONS = [
-  { label: "Predict Crop Loss",   icon: "🌿", path: "/loss",   color: "var(--gov-green)" },
-  { label: "Price Forecasting",   icon: "💰", path: "/price",  color: "var(--gov-navy)" },
-  { label: "Supply Chain",         icon: "🚛", path: "/supply", color: "var(--gov-saffron)" },
-  { label: "View History",         icon: "📋", path: "/history",color: "#6b7280" },
-];
 
 export default function Home() {
   const { user } = useAuth();
+  const { t } = useLang();
   const navigate = useNavigate();
   const [stats, setStats]     = useState({ total: 0, byType: [] });
   const [history, setHistory] = useState([]);
@@ -20,7 +14,15 @@ export default function Home() {
   const [weather, setWeather]     = useState(null);
   const [mandiPrices, setMandiPrices] = useState([]);
   const [mandiLoading, setMandiLoading] = useState(true);
+  const [mandiConnected, setMandiConnected] = useState(false);
   const [showAllMandi, setShowAllMandi] = useState(false);
+
+  const QUICK_ACTIONS = [
+    { labelKey: "home.predictLoss",  icon: "🌿", path: "/loss",   color: "var(--gov-green)" },
+    { labelKey: "home.predictPrice", icon: "💰", path: "/price",  color: "var(--gov-navy)" },
+    { labelKey: "home.supplyChain",  icon: "🚛", path: "/supply", color: "var(--gov-saffron)" },
+    { labelKey: "home.viewHistory",  icon: "📋", path: "/history", color: "#6b7280" },
+  ];
 
   useEffect(() => {
     // Fetch stats & recent history from backend
@@ -56,7 +58,7 @@ export default function Home() {
           }
         })
         .catch(() => {
-          // Fallback to Open-Meteo (no key needed)
+          // Fallback to Open-Meteo (no key needed — this is a real API, not static)
           fetch("https://api.open-meteo.com/v1/forecast?latitude=26.84&longitude=80.94&current_weather=true")
             .then(r => r.json())
             .then(d => {
@@ -78,7 +80,7 @@ export default function Home() {
     const mandiUrl = import.meta.env.VITE_DATA_GOV_MANDI_URL;
     if (govKey && govKey !== "your_data_gov_in_api_key_here" && mandiUrl) {
       const userState = user?.location?.state || "Uttar Pradesh";
-      fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=50&filters[State.keyword]=${userState}`)
+      fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=50&filters[state]=${userState}`)
         .then(r => r.json())
         .then(d => {
           if (d.records && d.records.length > 0) {
@@ -92,53 +94,24 @@ export default function Home() {
               date:    r.Arrival_Date || r["Price Date"] || "—",
             }));
             setMandiPrices(prices);
-          } else {
-            // Fallback demo data if API returns empty
-            setMandiPrices(getDemoMandiPrices());
+            setMandiConnected(true);
           }
         })
-        .catch(() => setMandiPrices(getDemoMandiPrices()))
+        .catch(() => {})
         .finally(() => setMandiLoading(false));
     } else {
-      setMandiPrices(getDemoMandiPrices());
       setMandiLoading(false);
     }
   }, []);
 
-  function getDemoMandiPrices() {
-    const city = user?.location?.district || "Lucknow";
-    const state = user?.location?.state || "UP";
-    const ALL_CROPS = [
-      { c: "Wheat", min: 2100, max: 2350 }, { c: "Rice", min: 1850, max: 2050 }, { c: "Tomato", min: 700, max: 1000 },
-      { c: "Onion", min: 1000, max: 1400 }, { c: "Potato", min: 500, max: 750 }, { c: "Maize", min: 1700, max: 1950 },
-      { c: "Sugarcane", min: 280, max: 350 }, { c: "Cotton", min: 6500, max: 7200 }, { c: "Soybean", min: 4200, max: 4800 },
-      { c: "Groundnut", min: 5500, max: 6200 }, { c: "Bajra", min: 1800, max: 2100 }, { c: "Jowar", min: 2300, max: 2700 },
-      { c: "Barley", min: 1900, max: 2200 }, { c: "Mustard", min: 5000, max: 5600 }, { c: "Mango", min: 3000, max: 5000 },
-      { c: "Apple", min: 6000, max: 8000 }, { c: "Banana", min: 1200, max: 1800 }, { c: "Chickpea", min: 4500, max: 5200 },
-      { c: "Lentil", min: 5800, max: 6500 }, { c: "Turmeric", min: 7000, max: 8500 }, { c: "Chilli", min: 12000, max: 15000 },
-      { c: "Ginger", min: 4000, max: 6000 }, { c: "Garlic", min: 8000, max: 12000 }, { c: "Coffee", min: 15000, max: 20000 },
-      { c: "Tea", min: 10000, max: 18000 }, { c: "Millet", min: 2000, max: 2500 }, { c: "Watermelon", min: 800, max: 1500 }
-    ];
-    return ALL_CROPS.map(cr => ({
-      crop: cr.c, market: city, state: state, minPrice: cr.min, maxPrice: cr.max, 
-      modalPrice: Math.floor((cr.min + cr.max) / 2), date: "Indicative"
-    }));
-  }
-
   const typeCount = (type) =>
     stats.byType?.find(b => b._id === type)?.count ?? 0;
 
-  const chartData = [
-    { name: "Loss Predictions",   value: typeCount("loss")   },
-    { name: "Price Forecasts",    value: typeCount("price")  },
-    { name: "Supply Chain",       value: typeCount("supply") },
-  ];
-
   const greeting = () => {
     const h = new Date().getHours();
-    if (h < 12) return "Good Morning";
-    if (h < 17) return "Good Afternoon";
-    return "Good Evening";
+    if (h < 12) return t("home.greeting.morning");
+    if (h < 17) return t("home.greeting.afternoon");
+    return t("home.greeting.evening");
   };
 
   return (
@@ -146,13 +119,13 @@ export default function Home() {
       {/* Page Header */}
       <div className="page-header">
         <div>
-          <div className="breadcrumb">🏠 <span>Dashboard</span></div>
-          <h1>🏠 Dashboard Overview</h1>
-          <p>{greeting()}, {user?.name?.split(" ")[0] || "Farmer"}! Here is your agriculture intelligence summary.</p>
+          <div className="breadcrumb">🏠 <span>{t("nav.dashboard")}</span></div>
+          <h1>{t("home.title")}</h1>
+          <p>{greeting()}, {user?.name?.split(" ")[0] || "Farmer"}! {t("home.subtitle")}</p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <div className={`badge ${mlStatus === "ok" ? "badge-green" : "badge-red"}`} style={{ fontSize: 11 }}>
-            🐍 ML: {mlStatus === "ok" ? "Online" : mlStatus === "offline" ? "Offline" : "..."}
+            🐍 {mlStatus === "ok" ? t("home.mlOnline") : mlStatus === "offline" ? t("home.mlOffline") : "..."}
           </div>
           {weather && (
             <div className="badge badge-blue" style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>
@@ -161,7 +134,7 @@ export default function Home() {
                   alt="" style={{ width: 20, height: 20 }} />
               )}
               {weather.city}: {weather.temp}°C
-              {weather.humidity ? ` · ${weather.humidity}% humidity` : ""}
+              {weather.humidity ? ` · ${weather.humidity}%` : ""}
             </div>
           )}
         </div>
@@ -171,112 +144,79 @@ export default function Home() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon">📊</div>
-          <div className="stat-label">Total Predictions</div>
+          <div className="stat-label">{t("home.totalPred")}</div>
           <div className="stat-value">{stats.total}</div>
-          <div className="stat-sub">All-time analyses run</div>
+          <div className="stat-sub">{t("home.totalSub")}</div>
         </div>
         <div className="stat-card green">
           <div className="stat-icon">🌿</div>
-          <div className="stat-label">Loss Predictions</div>
+          <div className="stat-label">{t("home.lossPred")}</div>
           <div className="stat-value">{typeCount("loss")}</div>
-          <div className="stat-sub">Crop risk assessments</div>
+          <div className="stat-sub">{t("home.lossSub")}</div>
         </div>
         <div className="stat-card saffron">
           <div className="stat-icon">💰</div>
-          <div className="stat-label">Price Forecasts</div>
+          <div className="stat-label">{t("home.pricePred")}</div>
           <div className="stat-value">{typeCount("price")}</div>
-          <div className="stat-sub">Market price predictions</div>
+          <div className="stat-sub">{t("home.priceSub")}</div>
         </div>
         <div className="stat-card gold">
           <div className="stat-icon">🚛</div>
-          <div className="stat-label">Supply Analyses</div>
+          <div className="stat-label">{t("home.supplyPred")}</div>
           <div className="stat-value">{typeCount("supply")}</div>
-          <div className="stat-sub">Supply chain reports</div>
+          <div className="stat-sub">{t("home.supplySub")}</div>
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions — Large thumb-friendly buttons */}
       <div className="card mb-4">
         <div className="card-header">
-          <h3>⚡ Quick Actions — Shighra Prakriya</h3>
+          <h3>{t("home.quickActions")}</h3>
         </div>
-        <div className="card-body" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+        <div className="card-body quick-actions-grid">
           {QUICK_ACTIONS.map((a) => (
             <button key={a.path} id={`quick-${a.path.replace("/","")}`}
               onClick={() => navigate(a.path)}
-              style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-                padding: "16px 12px", borderRadius: 6, border: `1px solid ${a.color}20`,
-                background: `${a.color}08`, cursor: "pointer",
-                transition: "all 0.18s ease", color: a.color,
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = `${a.color}18`; e.currentTarget.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = `${a.color}08`; e.currentTarget.style.transform = ""; }}
+              className="quick-action-btn"
+              style={{ '--action-color': a.color }}
             >
-              <span style={{ fontSize: 28 }}>{a.icon}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, textAlign: "center" }}>{a.label}</span>
+              <span className="quick-action-icon">{a.icon}</span>
+              <span className="quick-action-label">{t(a.labelKey)}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Weather Card + Activity Chart */}
-      <div className="grid-2" style={{ marginBottom: 18 }}>
-        {/* Weather Card */}
-        <div className="card">
-          <div className="card-header">
-            <h3>🌤️ Live Weather — {weather?.city || "India"}</h3>
-            <span className="badge badge-green" style={{ fontSize: 10 }}>OpenWeatherMap API</span>
-          </div>
-          <div className="card-body">
-            {weather ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "8px 0" }}>
-                {weather.icon && (
-                  <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
-                    alt={weather.desc} style={{ width: 64, height: 64 }} />
-                )}
-                <div>
-                  <div style={{ fontSize: 32, fontWeight: 800, color: "#003366", lineHeight: 1 }}>
-                    {weather.temp}°C
-                  </div>
-                  <div style={{ fontSize: 13, color: "#6b7280", textTransform: "capitalize", marginTop: 4 }}>
-                    {weather.desc}
-                  </div>
-                  <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 2 }}>
-                    {weather.humidity ? `Humidity: ${weather.humidity}% · ` : ""}
-                    Wind: {weather.wind} m/s
-                  </div>
+      {/* Weather Card */}
+      <div className="card mb-4">
+        <div className="card-header">
+          <h3>{t("home.weather")} — {weather?.city || "India"}</h3>
+        </div>
+        <div className="card-body">
+          {weather ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "8px 0" }}>
+              {weather.icon && (
+                <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                  alt={weather.desc} style={{ width: 64, height: 64 }} />
+              )}
+              <div>
+                <div style={{ fontSize: 32, fontWeight: 800, color: "#003366", lineHeight: 1 }}>
+                  {weather.temp}°C
+                </div>
+                <div style={{ fontSize: 13, color: "#6b7280", textTransform: "capitalize", marginTop: 4 }}>
+                  {weather.desc}
+                </div>
+                <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 2 }}>
+                  {weather.humidity ? `${t("loss.humidity")}: ${weather.humidity}% · ` : ""}
+                  Wind: {weather.wind} m/s
                 </div>
               </div>
-            ) : (
-              <div className="loading-center"><div className="spinner" /><p>Loading weather...</p></div>
-            )}
-            <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 8, borderTop: "1px solid #e5e7eb", paddingTop: 6 }}>
-              Source: OpenWeatherMap API · Updates on page load
             </div>
-          </div>
-        </div>
-
-        {/* Activity chart */}
-        <div className="card">
-          <div className="card-header"><h3>📊 Prediction Activity</h3></div>
-          <div className="card-body">
-            {stats.total === 0 ? (
-              <div className="empty-state">
-                <div className="icon">📊</div>
-                <p>No predictions yet. Start with a Quick Action above.</p>
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={160}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-                  <Tooltip contentStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="value" fill="#003366" radius={[3,3,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+          ) : (
+            <div className="loading-center"><div className="spinner" /><p>{t("home.loadingWeather")}</p></div>
+          )}
+          <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 8, borderTop: "1px solid #e5e7eb", paddingTop: 6 }}>
+            {t("home.weatherSource")}
           </div>
         </div>
       </div>
@@ -285,32 +225,36 @@ export default function Home() {
       <div className="card" style={{ marginBottom: 18 }}>
         <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <h3 style={{ margin: 0 }}>🏪 Live Mandi Prices (₹/Quintal)</h3>
-            <span className="badge badge-blue" style={{ fontSize: 10 }}>
-              {mandiPrices[0]?.date === "Indicative" ? "Indicative" : "data.gov.in API"}
-            </span>
+            <h3 style={{ margin: 0 }}>{t("home.mandi")}</h3>
+            {mandiConnected && (
+              <span className="badge badge-blue" style={{ fontSize: 10 }}>data.gov.in API</span>
+            )}
           </div>
           {mandiPrices.length > 5 && (
             <button className="btn btn-outline btn-sm" onClick={() => setShowAllMandi(!showAllMandi)}>
-              {showAllMandi ? "View Less" : "View All →"}
+              {showAllMandi ? t("home.viewLess") : t("home.viewAll")}
             </button>
           )}
         </div>
         <div className="card-body" style={{ padding: 0 }}>
           {mandiLoading ? (
-            <div className="loading-center"><div className="spinner" /><p>Fetching mandi prices from data.gov.in...</p></div>
+            <div className="loading-center"><div className="spinner" /><p>{t("home.mandiLoading")}</p></div>
+          ) : mandiPrices.length === 0 ? (
+            <div className="empty-state" style={{ padding: "30px 20px" }}>
+              <div className="icon">🏪</div>
+              <p>{t("home.mandiNoApi")}</p>
+            </div>
           ) : (
             <div className="table-wrapper">
               <table className="gov-table">
                 <thead>
                   <tr>
-                    <th>Commodity</th>
-                    <th>Market</th>
-                    <th>State</th>
-                    <th>Min Price</th>
-                    <th>Max Price</th>
-                    <th>Modal Price</th>
-                    <th>Date</th>
+                    <th>{t("home.commodity")}</th>
+                    <th>{t("home.market")}</th>
+                    <th>{t("home.minPrice")}</th>
+                    <th>{t("home.maxPrice")}</th>
+                    <th>{t("home.modalPrice")}</th>
+                    <th>{t("home.date")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -318,7 +262,6 @@ export default function Home() {
                     <tr key={i}>
                       <td style={{ fontWeight: 600 }}>{p.crop}</td>
                       <td>{p.market}</td>
-                      <td>{p.state}</td>
                       <td>₹{p.minPrice?.toLocaleString("en-IN")}</td>
                       <td>₹{p.maxPrice?.toLocaleString("en-IN")}</td>
                       <td style={{ fontWeight: 700, color: "#003366" }}>₹{p.modalPrice?.toLocaleString("en-IN")}</td>
@@ -330,7 +273,7 @@ export default function Home() {
             </div>
           )}
           <div style={{ fontSize: 10, color: "#9ca3af", padding: "6px 14px", borderTop: "1px solid #e5e7eb" }}>
-            Source: data.gov.in (Agmarknet) · API Key connected · Go to Price Forecasting for ML predictions
+            {t("home.mandiSource")}
           </div>
         </div>
       </div>
@@ -338,19 +281,19 @@ export default function Home() {
       {/* Recent History */}
       <div className="card">
         <div className="card-header">
-          <h3>📋 Recent Predictions</h3>
+          <h3>{t("home.recentPred")}</h3>
           <button className="btn btn-outline btn-sm" onClick={() => navigate("/history")} id="btn-view-all">
-            View All →
+            {t("home.viewAll")}
           </button>
         </div>
         <div className="card-body" style={{ padding: 0 }}>
           {history.length === 0 ? (
-            <div className="empty-state"><div className="icon">📋</div><p>No prediction history found.</p></div>
+            <div className="empty-state"><div className="icon">📋</div><p>{t("home.noPred")}</p></div>
           ) : (
             <div className="table-wrapper">
               <table className="gov-table">
                 <thead>
-                  <tr><th>#</th><th>Type</th><th>Crop</th><th>Result</th><th>Date</th></tr>
+                  <tr><th>#</th><th>{t("home.type")}</th><th>{t("home.crop")}</th><th>{t("home.result")}</th><th>{t("home.date")}</th></tr>
                 </thead>
                 <tbody>
                   {history.map((r, i) => (

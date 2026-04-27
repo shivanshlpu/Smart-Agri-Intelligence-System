@@ -72,11 +72,28 @@ def preprocess_loss(data: dict) -> np.ndarray:
     return np.array([features])
 
 
+# ── Crop-specific median prices (₹/quintal) for auto-fill when user sends 0 ──
+CROP_MEDIAN_PRICES = {
+    "Wheat": (1900, 2400), "Rice": (1700, 2100), "Tomato": (600, 1200),
+    "Onion": (800, 1500), "Potato": (400, 800), "Maize": (1500, 2000),
+    "Sugarcane": (280, 380), "Cotton": (5500, 7500), "Soybean": (3800, 5200),
+    "Groundnut": (4800, 6500), "Bajra": (1600, 2200), "Jowar": (2000, 2800),
+    "Barley": (1600, 2300), "Mustard": (4500, 5800), "Mango": (2500, 5500),
+    "Apple": (5000, 9000), "Banana": (1000, 2000), "Chickpea": (4000, 5500),
+    "Lentil": (5000, 7000), "Turmeric": (6000, 9000), "Chilli": (10000, 16000),
+    "Ginger": (3500, 6500), "Garlic": (7000, 13000), "Coffee": (14000, 21000),
+    "Tea": (9000, 19000), "Millet": (1700, 2600), "Watermelon": (500, 1500),
+}
+
 def preprocess_price(data: dict) -> np.ndarray:
     """
     Real feature order (9 features):
     crop_enc, state_enc, season_enc, month, year,
     min_price, max_price, avg_production, price_spread
+
+    IMPORTANT: When min_price or max_price is 0 (farmer doesn't know),
+    we auto-fill from crop-specific historical median values to prevent
+    the model from predicting negative prices.
     """
     crop   = data.get("crop_type", "Wheat").strip().title()
     state  = data.get("state", "Maharashtra").strip().title()
@@ -104,10 +121,21 @@ def preprocess_price(data: dict) -> np.ndarray:
     import datetime
     month = int(data.get("month", datetime.datetime.now().month))
     year  = int(data.get("year", datetime.datetime.now().year))
-    min_price      = float(data.get("min_price", 0))
-    max_price      = float(data.get("max_price", 0))
+
+    # Auto-fill min/max from historical medians when user sends 0
+    default_min, default_max = CROP_MEDIAN_PRICES.get(crop, (1200, 2000))
+    min_price = float(data.get("min_price", 0))
+    max_price = float(data.get("max_price", 0))
+    if min_price <= 0:
+        min_price = float(default_min)
+    if max_price <= 0:
+        max_price = float(default_max)
+    # Ensure max >= min
+    if max_price < min_price:
+        max_price = min_price * 1.2
+
     avg_production = float(data.get("avg_production", data.get("supply_index", 50)) or 50)
-    price_spread   = max_price - min_price if max_price > min_price else float(data.get("demand_index", 50))
+    price_spread   = max(max_price - min_price, 0)  # Never negative
 
     features = [crop_enc, state_enc, season_enc, month, year,
                 min_price, max_price, avg_production, price_spread]

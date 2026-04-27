@@ -1,8 +1,11 @@
 import { useAuth } from "../context/AuthContext";
+import { useLang } from "../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import LanguageToggle from "./LanguageToggle";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { t } = useLang();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -18,10 +21,11 @@ export default function Navbar() {
     <header className="navbar">
       <div className="navbar-brand">
         <span className="emblem">🏛️</span>
-        Ministry of Agriculture & Farmers Welfare — Smart Agri Intelligence System
+        {t("app.ministry")} — {t("navbar.brand")}
       </div>
 
       <div className="navbar-right">
+        <LanguageToggle />
         {user && (
           <>
             <div className="navbar-user">
@@ -33,11 +37,11 @@ export default function Navbar() {
                 </div>
               </div>
             </div>
-            <button onClick={handleLogout} id="btn-logout">🚪 Logout</button>
+            <button onClick={handleLogout} id="btn-logout">{t("navbar.logout")}</button>
           </>
         )}
         {!user && (
-          <button onClick={() => navigate("/login")} id="btn-login-nav">Login</button>
+          <button onClick={() => navigate("/login")} id="btn-login-nav">{t("navbar.login")}</button>
         )}
       </div>
     </header>

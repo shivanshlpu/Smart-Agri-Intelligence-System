@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useLang } from "../context/LanguageContext";
 import API from "../api/axiosConfig";
 import { toast } from "react-toastify";
 
@@ -9,6 +10,7 @@ const STATES = ["Uttar Pradesh","Maharashtra","Punjab","Haryana","Madhya Pradesh
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
+  const { t } = useLang();
   const [form, setForm] = useState({
     name: user?.name || "", phone: user?.phone || "",
     location: { state: user?.location?.state || "", district: user?.location?.district || "" }
@@ -30,7 +32,7 @@ export default function Profile() {
     try {
       const { data } = await API.put("/auth/profile", form);
       updateUser(data.user);
-      toast.success("Profile updated successfully.");
+      toast.success("✅");
     } catch (err) {
       toast.error(err.response?.data?.error || "Update failed.");
     } finally { setSaving(false); }
@@ -42,9 +44,9 @@ export default function Profile() {
     <div className="page-wrapper">
       <div className="page-header">
         <div>
-          <div className="breadcrumb">🏠 Dashboard › <span>My Profile</span></div>
-          <h1>👤 My Profile — Mera Vivran</h1>
-          <p>Update your personal information and account details.</p>
+          <div className="breadcrumb">🏠 {t("nav.dashboard")} › <span>{t("nav.profile")}</span></div>
+          <h1>{t("profile.title")}</h1>
+          <p>{t("profile.subtitle")}</p>
         </div>
       </div>
 
@@ -72,60 +74,60 @@ export default function Profile() {
                 )}
               </div>
               <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 10 }}>
-                Member since {new Date(user?.createdAt || Date.now()).toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
+                {t("profile.memberSince")} {new Date(user?.createdAt || Date.now()).toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
               </div>
             </div>
           </div>
 
           <div className="alert alert-info" style={{ marginTop: 14 }}>
             <div>
-              <strong>✅ Account Verified</strong><br />
-              Your account is active and verified on the Kisan Sahayak Portal.
+              <strong>{t("profile.verified")}</strong><br />
+              {t("profile.verifiedMsg")}
             </div>
           </div>
         </div>
 
         {/* Edit form */}
         <div className="form-section">
-          <div className="form-section-header">✏️ Edit Profile Information</div>
+          <div className="form-section-header">{t("profile.edit")}</div>
           <div className="form-body">
             <form onSubmit={submit}>
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Full Name <span className="required">*</span></label>
+                  <label>{t("auth.fullName")} <span className="required">*</span></label>
                   <input id="profile-name" name="name" className="form-control"
                     value={form.name} onChange={handle} required />
                 </div>
                 <div className="form-group">
-                  <label>Mobile Number / Phone</label>
+                  <label>{t("auth.mobile")}</label>
                   <input id="profile-phone" name="phone" className="form-control"
                     placeholder="9876543210" value={form.phone} onChange={handle} />
                 </div>
                 <div className="form-group">
-                  <label>State / Rajya</label>
+                  <label>{t("auth.state")}</label>
                   <select id="profile-state" name="state" className="form-control"
                     value={form.location.state} onChange={handle}>
-                    <option value="">-- Select State --</option>
+                    <option value="">{t("auth.selectState")}</option>
                     {STATES.map(s => <option key={s}>{s}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>District / Jila</label>
+                  <label>{t("auth.district")}</label>
                   <input id="profile-district" name="district" className="form-control"
                     placeholder="Your district" value={form.location.district} onChange={handle} />
                 </div>
               </div>
 
               <div className="form-group" style={{ marginTop: 14 }}>
-                <label>Email Address</label>
+                <label>{t("auth.email")}</label>
                 <input className="form-control" value={user?.email || ""} disabled
                   style={{ background: "#f3f4f6", color: "#9ca3af" }} />
-                <span className="form-hint">Email cannot be changed.</span>
+                <span className="form-hint">{t("profile.emailHint")}</span>
               </div>
 
               <button id="btn-save-profile" type="submit" className="btn btn-primary btn-lg w-full"
                 style={{ marginTop: 18 }} disabled={saving}>
-                {saving ? "Saving..." : "💾 Save Changes"}
+                {saving ? t("profile.saving") : t("profile.saveBtn")}
               </button>
             </form>
           </div>

@@ -102,7 +102,17 @@ def predict_price():
             })
 
         pred = price_model.predict(X)[0]
-        return jsonify({"predicted_price": round(float(pred), 2), "unit": "₹/Quintal"})
+        predicted_price = max(round(float(pred), 2), 0)  # Never negative
+        
+        result = {"predicted_price": predicted_price, "unit": "₹/Quintal"}
+        
+        # Add note if min/max were auto-filled (user sent 0)
+        min_sent = float(data.get("min_price", 0))
+        max_sent = float(data.get("max_price", 0))
+        if min_sent <= 0 or max_sent <= 0:
+            result["note"] = "Market price estimates were used as you did not provide min/max prices. For more accurate results, enter current mandi prices."
+        
+        return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -134,6 +144,6 @@ def predict_supply():
 
 if __name__ == "__main__":
     port = int(os.getenv("ML_PORT", 8000))
-    print(f"\n🐍 Smart Agri ML Server running on port {port}")
-    print(f"📦 Models loaded: loss={loss_model is not None}, price={price_model is not None}, supply={supply_model is not None}\n")
+    print(f"\n[ML] Smart Agri ML Server running on port {port}")
+    print(f"[ML] Models loaded: loss={loss_model is not None}, price={price_model is not None}, supply={supply_model is not None}\n")
     app.run(host="0.0.0.0", port=port, debug=True)

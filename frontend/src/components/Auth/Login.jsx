@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useLang } from "../../context/LanguageContext";
 import { toast } from "react-toastify";
+import LanguageToggle from "../LanguageToggle";
 
 export default function Login() {
   const { login, loading } = useAuth();
+  const { t } = useLang();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [err, setErr] = useState("");
@@ -16,7 +19,7 @@ export default function Login() {
     setErr("");
     const res = await login(form.email, form.password);
     if (res.success) {
-      toast.success("Login successful. Welcome back!");
+      toast.success("✅");
       navigate("/");
     } else {
       setErr(res.error);
@@ -28,20 +31,21 @@ export default function Login() {
       <div style={{ width: "100%", maxWidth: 460 }}>
         {/* Gov strip */}
         <div className="gov-strip">
-          <span>🇮🇳 Government of India</span>
-          <span>Ministry of Agriculture &amp; Farmers Welfare</span>
+          <span>{t("app.footer")}</span>
+          <span>{t("app.ministry")}</span>
+          <LanguageToggle style={{ marginLeft: "auto" }} />
         </div>
 
         <div className="auth-card">
           <div className="auth-card-header">
             <div className="emblem">🌾</div>
-            <h2>Kisan Sahayak Portal</h2>
-            <p>Smart Agriculture Intelligence System</p>
+            <h2>{t("app.name")}</h2>
+            <p>{t("app.subtitle")}</p>
           </div>
 
           <div className="auth-card-body">
             <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: "#003366" }}>
-              Sign In to your Account
+              {t("auth.signin")}
             </h3>
 
             {err && (
@@ -52,31 +56,31 @@ export default function Login() {
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div className="form-group">
-                <label>Email Address <span className="required">*</span></label>
+                <label>{t("auth.email")} <span className="required">*</span></label>
                 <input id="login-email" name="email" type="email" className="form-control"
                   placeholder="your@email.com" value={form.email} onChange={handle} required />
               </div>
               <div className="form-group">
-                <label>Password <span className="required">*</span></label>
+                <label>{t("auth.password")} <span className="required">*</span></label>
                 <input id="login-password" name="password" type="password" className="form-control"
-                  placeholder="Enter your password" value={form.password} onChange={handle} required />
+                  placeholder="••••••••" value={form.password} onChange={handle} required />
               </div>
 
               <button id="btn-login" type="submit" className="btn btn-primary w-full btn-lg"
                 disabled={loading} style={{ marginTop: 4 }}>
-                {loading ? "Signing in..." : "🔐 Sign In"}
+                {loading ? t("auth.signingIn") : t("auth.signinBtn")}
               </button>
             </form>
 
             <div className="auth-divider">or</div>
 
             <div style={{ textAlign: "center", fontSize: 13 }}>
-              Don't have an account?{" "}
-              <Link to="/register" style={{ color: "#003366", fontWeight: 600 }}>Register here</Link>
+              {t("auth.noAccount")}{" "}
+              <Link to="/register" style={{ color: "#003366", fontWeight: 600 }}>{t("auth.registerLink")}</Link>
             </div>
 
             <div className="alert alert-info" style={{ marginTop: 16, fontSize: 12 }}>
-              💡 <strong>Demo:</strong> Create a new account to get started. Your data is encrypted and secure.
+              💡 <strong>Demo:</strong> {t("auth.demo")}
             </div>
           </div>
         </div>
