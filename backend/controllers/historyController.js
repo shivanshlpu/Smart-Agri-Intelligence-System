@@ -35,6 +35,18 @@ exports.deleteRecord = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// POST /api/history/bulk-delete
+exports.bulkDelete = async (req, res, next) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "No IDs provided." });
+    }
+    const result = await Prediction.deleteMany({ _id: { $in: ids }, userId: req.user._id });
+    res.json({ message: `${result.deletedCount} record(s) deleted.`, deletedCount: result.deletedCount });
+  } catch (err) { next(err); }
+};
+
 // GET /api/history/stats
 exports.getStats = async (req, res, next) => {
   try {

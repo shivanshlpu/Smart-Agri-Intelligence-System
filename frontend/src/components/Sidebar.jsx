@@ -16,6 +16,12 @@ export default function Sidebar() {
         { to: "/loss", label: t("nav.loss"), icon: "🌿" },
         { to: "/price", label: t("nav.price"), icon: "💰" },
         { to: "/supply", label: t("nav.supply"), icon: "🚛" },
+        { to: "/soil", label: t("nav.soil"), icon: "🧪" },
+      ]
+    },
+    {
+      section: t("nav.services"), links: [
+        { to: "/schemes", label: t("nav.schemes"), icon: "🏛️" },
       ]
     },
     {

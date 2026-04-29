@@ -79,15 +79,32 @@ export default function Home() {
     const govKey = import.meta.env.VITE_DATA_GOV_API_KEY;
     const mandiUrl = import.meta.env.VITE_DATA_GOV_MANDI_URL;
     if (govKey && govKey !== "your_data_gov_in_api_key_here" && mandiUrl) {
-      const userState = user?.location?.state || "Uttar Pradesh";
-      fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=50&filters[state]=${userState}`)
-        .then(r => r.json())
+      // Format state to match data.gov.in conventions (e.g., Title Case, "NCT of Delhi")
+      let userState = user?.location?.state || "Uttar Pradesh";
+      if (userState.toLowerCase() === "delhi") userState = "NCT of Delhi";
+      else userState = userState.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase());
+      
+      const fetchMandi = (stateToFetch) => {
+        const stateQuery = stateToFetch ? `&filters[state]=${encodeURIComponent(stateToFetch)}` : "";
+        // Added &sort[Arrival_Date]=desc to get CURRENT (April 2026) data instead of old 2025 data
+        return fetch(`${mandiUrl}?api-key=${govKey}&format=json&limit=50&sort[Arrival_Date]=desc${stateQuery}`)
+          .then(r => r.json());
+      };
+
+      fetchMandi(userState)
+        .then(d => {
+          // If no records for the user's state, fallback to national (all states)
+          if (!d.records || d.records.length === 0) {
+            return fetchMandi(null);
+          }
+          return d;
+        })
         .then(d => {
           if (d.records && d.records.length > 0) {
             const prices = d.records.map(r => ({
               crop:    r.Commodity || r.commodity || "—",
               market:  r.Market || r.market || r["Market Name"] || "—",
-              state:   r.State || r.state || userState,
+              state:   r.State || r.state || "—",
               minPrice:  Number(r.Min_Price || r.min_price || 0),
               maxPrice:  Number(r.Max_Price || r.max_price || 0),
               modalPrice: Number(r.Modal_Price || r.modal_price || 0),
@@ -97,7 +114,7 @@ export default function Home() {
             setMandiConnected(true);
           }
         })
-        .catch(() => {})
+        .catch(err => console.error("Mandi API Error:", err))
         .finally(() => setMandiLoading(false));
     } else {
       setMandiLoading(false);

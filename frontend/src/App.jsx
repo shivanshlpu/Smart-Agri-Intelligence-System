@@ -3,12 +3,15 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import Navbar   from "./components/Navbar";
 import Sidebar  from "./components/Sidebar";
+import VoiceAssistant from "./components/VoiceAssistant";
 import Home     from "./pages/Home";
 import PredictLoss   from "./pages/PredictLoss";
 import PredictPrice  from "./pages/PredictPrice";
 import SupplyChain   from "./pages/SupplyChain";
 import History  from "./pages/History";
 import Profile  from "./pages/Profile";
+import Schemes  from "./pages/Schemes";
+import SoilHealth from "./pages/SoilHealth";
 import Login    from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 
@@ -27,6 +30,7 @@ function AppLayout({ children }) {
         <Navbar />
         {children}
       </div>
+      <VoiceAssistant />
     </div>
   );
 }
@@ -68,6 +72,16 @@ function AppRoutes() {
       <Route path="/profile" element={
         <ProtectedRoute>
           <AppLayout><Profile /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/schemes" element={
+        <ProtectedRoute>
+          <AppLayout><Schemes /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/soil" element={
+        <ProtectedRoute>
+          <AppLayout><SoilHealth /></AppLayout>
         </ProtectedRoute>
       } />
 

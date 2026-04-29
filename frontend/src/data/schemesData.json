@@ -1,0 +1,254 @@
+[
+  {
+    "id": "pm-kisan",
+    "name": { "en": "PM-KISAN Samman Nidhi", "hi": "पीएम-किसान सम्मान निधि" },
+    "icon": "💰",
+    "category": "financial",
+    "type": "central",
+    "description": {
+      "en": "Direct income support of ₹6,000 per year in 3 installments to all land-holding farmer families.",
+      "hi": "सभी भूमिधारक किसान परिवारों को ₹6,000 प्रति वर्ष 3 किश्तों में सीधी आय सहायता।"
+    },
+    "benefits": {
+      "en": ["₹6,000/year in 3 installments of ₹2,000", "Direct bank transfer (DBT)", "No middlemen involved"],
+      "hi": ["₹2,000 की 3 किश्तों में ₹6,000/वर्ष", "सीधा बैंक हस्तांतरण (DBT)", "कोई बिचौलिया नहीं"]
+    },
+    "eligibility": {
+      "en": "All land-holding farmer families with cultivable land.",
+      "hi": "खेती योग्य भूमि वाले सभी भूमिधारक किसान परिवार।"
+    },
+    "link": "https://pmkisan.gov.in/",
+    "states": ["all"]
+  },
+  {
+    "id": "pmfby",
+    "name": { "en": "PM Fasal Bima Yojana (PMFBY)", "hi": "प्रधानमंत्री फसल बीमा योजना (PMFBY)" },
+    "icon": "🛡️",
+    "category": "insurance",
+    "type": "central",
+    "description": {
+      "en": "Comprehensive crop insurance at very low premium — 2% for Kharif, 1.5% for Rabi crops.",
+      "hi": "बहुत कम प्रीमियम पर व्यापक फसल बीमा — खरीफ 2%, रबी 1.5%।"
+    },
+    "benefits": {
+      "en": ["Low premium: 2% Kharif, 1.5% Rabi, 5% Horticultural", "Covers natural calamities, pests, diseases", "Full sum insured paid for total crop loss"],
+      "hi": ["कम प्रीमियम: खरीफ 2%, रबी 1.5%, बागवानी 5%", "प्राकृतिक आपदाओं, कीटों, बीमारियों को कवर करता है", "पूर्ण फसल नुकसान पर पूरी बीमा राशि"]
+    },
+    "eligibility": {
+      "en": "All farmers including sharecroppers and tenant farmers growing notified crops.",
+      "hi": "अधिसूचित फसल उगाने वाले सभी किसान, बटाईदार और किरायेदार किसान शामिल।"
+    },
+    "link": "https://pmfby.gov.in/",
+    "states": ["all"]
+  },
+  {
+    "id": "kcc",
+    "name": { "en": "Kisan Credit Card (KCC)", "hi": "किसान क्रेडिट कार्ड (KCC)" },
+    "icon": "💳",
+    "category": "financial",
+    "type": "central",
+    "description": {
+      "en": "Easy credit for farming needs at subsidized interest rate of 4% per annum.",
+      "hi": "खेती की जरूरतों के लिए 4% प्रति वर्ष सब्सिडी ब्याज दर पर आसान ऋण।"
+    },
+    "benefits": {
+      "en": ["Interest rate: 4% p.a. (with subvention)", "Covers crop production, post-harvest, and allied activities", "Insurance cover included", "Flexible repayment"],
+      "hi": ["ब्याज दर: 4% प्रति वर्ष (सरकारी सब्सिडी के साथ)", "फसल उत्पादन, कटाई के बाद, सहायक गतिविधियाँ शामिल", "बीमा कवर शामिल", "लचीला भुगतान"]
+    },
+    "eligibility": {
+      "en": "Individual farmers, Joint borrowers, SHGs, Tenant farmers.",
+      "hi": "व्यक्तिगत किसान, संयुक्त उधारकर्ता, स्वयं सहायता समूह, किरायेदार किसान।"
+    },
+    "link": "https://www.pmkisan.gov.in/",
+    "states": ["all"]
+  },
+  {
+    "id": "soil-health-card",
+    "name": { "en": "Soil Health Card Scheme", "hi": "मृदा स्वास्थ्य कार्ड योजना" },
+    "icon": "🧪",
+    "category": "technology",
+    "type": "central",
+    "description": {
+      "en": "Free soil testing and a Soil Health Card with crop-wise fertilizer recommendations.",
+      "hi": "मुफ्त मिट्टी परीक्षण और फसलवार उर्वरक सिफारिशों के साथ मृदा स्वास्थ्य कार्ड।"
+    },
+    "benefits": {
+      "en": ["Free soil nutrient analysis", "Crop-specific fertilizer dosage advice", "Issued every 2 years"],
+      "hi": ["मुफ्त मिट्टी पोषक तत्व विश्लेषण", "फसल-विशिष्ट उर्वरक खुराक सलाह", "हर 2 साल में जारी"]
+    },
+    "eligibility": {
+      "en": "All farmers across India.",
+      "hi": "भारत भर के सभी किसान।"
+    },
+    "link": "https://soilhealth.dac.gov.in/",
+    "states": ["all"]
+  },
+  {
+    "id": "e-nam",
+    "name": { "en": "e-NAM (National Agriculture Market)", "hi": "ई-नाम (राष्ट्रीय कृषि बाज़ार)" },
+    "icon": "🏪",
+    "category": "market",
+    "type": "central",
+    "description": {
+      "en": "Online trading platform for agricultural commodities — sell your crop at the best price from any mandi.",
+      "hi": "कृषि वस्तुओं के लिए ऑनलाइन ट्रेडिंग प्लेटफॉर्म — किसी भी मंडी से सबसे अच्छे दाम पर फसल बेचें।"
+    },
+    "benefits": {
+      "en": ["Access to buyers across India", "Transparent price discovery", "Online payment directly to bank", "Real-time mandi prices"],
+      "hi": ["पूरे भारत में खरीदारों तक पहुँच", "पारदर्शी मूल्य खोज", "सीधे बैंक में ऑनलाइन भुगतान", "वास्तविक समय मंडी भाव"]
+    },
+    "eligibility": {
+      "en": "All farmers, traders, and FPOs registered on eNAM portal.",
+      "hi": "eNAM पोर्टल पर पंजीकृत सभी किसान, व्यापारी और FPO।"
+    },
+    "link": "https://enam.gov.in/",
+    "states": ["all"]
+  },
+  {
+    "id": "pkvy",
+    "name": { "en": "Paramparagat Krishi Vikas Yojana", "hi": "परम्परागत कृषि विकास योजना" },
+    "icon": "🌱",
+    "category": "technology",
+    "type": "central",
+    "description": {
+      "en": "Promotes organic farming with ₹50,000/hectare assistance over 3 years.",
+      "hi": "3 वर्षों में ₹50,000/हेक्टेयर सहायता के साथ जैविक खेती को बढ़ावा।"
+    },
+    "benefits": {
+      "en": ["₹50,000/ha over 3 years", "Organic certification support", "Training and capacity building", "Marketing support for organic produce"],
+      "hi": ["3 वर्षों में ₹50,000/हेक्टेयर", "जैविक प्रमाणन सहायता", "प्रशिक्षण और क्षमता निर्माण", "जैविक उपज के लिए विपणन सहायता"]
+    },
+    "eligibility": {
+      "en": "Farmer groups (clusters of 50 farmers) with at least 20 ha of land.",
+      "hi": "कम से कम 20 हेक्टेयर भूमि वाले किसान समूह (50 किसानों का क्लस्टर)।"
+    },
+    "link": "https://pgsindia-ncof.gov.in/pkvy/Index.aspx",
+    "states": ["all"]
+  },
+  {
+    "id": "pm-kusum",
+    "name": { "en": "PM-KUSUM (Solar Pump Scheme)", "hi": "पीएम-कुसुम (सोलर पंप योजना)" },
+    "icon": "☀️",
+    "category": "technology",
+    "type": "central",
+    "description": {
+      "en": "Subsidized solar pumps and solar power plants for farmers to reduce electricity costs.",
+      "hi": "बिजली खर्च कम करने के लिए किसानों को सब्सिडी पर सोलर पंप और सोलर पावर प्लांट।"
+    },
+    "benefits": {
+      "en": ["Up to 90% subsidy on solar pumps", "Earn by selling surplus solar power to grid", "Reduce diesel/electricity dependence"],
+      "hi": ["सोलर पंपों पर 90% तक सब्सिडी", "अतिरिक्त सौर ऊर्जा ग्रिड को बेचकर कमाई", "डीजल/बिजली निर्भरता कम करें"]
+    },
+    "eligibility": {
+      "en": "All farmers with agricultural land and water source.",
+      "hi": "कृषि भूमि और जल स्रोत वाले सभी किसान।"
+    },
+    "link": "https://pmkusum.mnre.gov.in/",
+    "states": ["all"]
+  },
+  {
+    "id": "up-kisan-rath",
+    "name": { "en": "UP Kisan Rath Mobile App", "hi": "यूपी किसान रथ मोबाइल ऐप" },
+    "icon": "🚜",
+    "category": "market",
+    "type": "state",
+    "description": {
+      "en": "Transport service to help UP farmers move their produce to mandis at subsidized rates.",
+      "hi": "यूपी किसानों को सब्सिडी दरों पर अपनी उपज मंडी तक ले जाने में मदद।"
+    },
+    "benefits": {
+      "en": ["Subsidized transport to mandis", "Book trucks via mobile app", "Real-time vehicle tracking"],
+      "hi": ["मंडी तक सब्सिडी वाला परिवहन", "मोबाइल ऐप से ट्रक बुक करें", "वाहन की रीयल-टाइम ट्रैकिंग"]
+    },
+    "eligibility": {
+      "en": "Farmers in Uttar Pradesh with Aadhaar-linked mobile.",
+      "hi": "आधार से जुड़े मोबाइल वाले उत्तर प्रदेश के किसान।"
+    },
+    "link": "https://upagripardarshi.gov.in/",
+    "states": ["Uttar Pradesh"]
+  },
+  {
+    "id": "rythu-bandhu",
+    "name": { "en": "Rythu Bandhu (Telangana)", "hi": "रायतू बंधु (तेलंगाना)" },
+    "icon": "🌾",
+    "category": "financial",
+    "type": "state",
+    "description": {
+      "en": "₹10,000/acre/year investment support for Telangana farmers for each crop season.",
+      "hi": "प्रत्येक फसल सीजन के लिए तेलंगाना किसानों को ₹10,000/एकड़/वर्ष निवेश सहायता।"
+    },
+    "benefits": {
+      "en": ["₹10,000/acre per year", "Paid before each crop season", "No loan — it's a grant"],
+      "hi": ["₹10,000/एकड़ प्रति वर्ष", "हर फसल सीजन से पहले भुगतान", "कोई ऋण नहीं — यह अनुदान है"]
+    },
+    "eligibility": {
+      "en": "All land-owning farmers in Telangana.",
+      "hi": "तेलंगाना में सभी भूमि मालिक किसान।"
+    },
+    "link": "https://rythubandhu.telangana.gov.in/",
+    "states": ["Telangana"]
+  },
+  {
+    "id": "kalia",
+    "name": { "en": "KALIA Scheme (Odisha)", "hi": "कालिया योजना (ओडिशा)" },
+    "icon": "🏡",
+    "category": "financial",
+    "type": "state",
+    "description": {
+      "en": "₹25,000 per farm family for cultivation and ₹12,500 for landless agricultural households.",
+      "hi": "प्रति कृषक परिवार को खेती के लिए ₹25,000 और भूमिहीन कृषि परिवारों को ₹12,500।"
+    },
+    "benefits": {
+      "en": ["₹25,000 for small/marginal farmers", "₹12,500 for landless labourers", "Life insurance cover of ₹2 lakh"],
+      "hi": ["छोटे/सीमांत किसानों को ₹25,000", "भूमिहीन मजदूरों को ₹12,500", "₹2 लाख का जीवन बीमा कवर"]
+    },
+    "eligibility": {
+      "en": "Small, marginal farmers and landless agricultural labourers in Odisha.",
+      "hi": "ओडिशा के छोटे, सीमांत किसान और भूमिहीन कृषि मजदूर।"
+    },
+    "link": "https://kalia.odisha.gov.in/",
+    "states": ["Odisha"]
+  },
+  {
+    "id": "mp-bhavantar",
+    "name": { "en": "Bhavantar Bhugtan Yojana (MP)", "hi": "भावांतर भुगतान योजना (म.प्र.)" },
+    "icon": "📊",
+    "category": "market",
+    "type": "state",
+    "description": {
+      "en": "Price deficiency payment scheme — if market price falls below MSP, the government pays the difference.",
+      "hi": "मूल्य अंतर भुगतान योजना — यदि बाज़ार मूल्य MSP से नीचे गिरता है, तो सरकार अंतर का भुगतान करती है।"
+    },
+    "benefits": {
+      "en": ["Guaranteed MSP-level income", "Difference paid directly to bank", "Covers 8 major crops"],
+      "hi": ["MSP स्तर की आय की गारंटी", "अंतर सीधे बैंक में भुगतान", "8 प्रमुख फसलों को कवर"]
+    },
+    "eligibility": {
+      "en": "Registered farmers in Madhya Pradesh who sell at registered mandis.",
+      "hi": "मध्य प्रदेश के पंजीकृत किसान जो पंजीकृत मंडियों में बेचते हैं।"
+    },
+    "link": "https://mpeuparjan.nic.in/",
+    "states": ["Madhya Pradesh"]
+  },
+  {
+    "id": "maha-shetkari",
+    "name": { "en": "Namo Shetkari Mahasanman (Maharashtra)", "hi": "नमो शेतकरी महासन्मान (महाराष्ट्र)" },
+    "icon": "🏆",
+    "category": "financial",
+    "type": "state",
+    "description": {
+      "en": "₹6,000/year additional income support to Maharashtra farmers (on top of PM-KISAN).",
+      "hi": "महाराष्ट्र किसानों को (PM-KISAN के अतिरिक्त) ₹6,000/वर्ष अतिरिक्त आय सहायता।"
+    },
+    "benefits": {
+      "en": ["₹6,000/year in 3 installments", "Combined with PM-KISAN = ₹12,000/year", "Direct bank transfer"],
+      "hi": ["3 किश्तों में ₹6,000/वर्ष", "PM-KISAN के साथ = ₹12,000/वर्ष", "सीधा बैंक हस्तांतरण"]
+    },
+    "eligibility": {
+      "en": "All land-holding farmer families in Maharashtra.",
+      "hi": "महाराष्ट्र में सभी भूमिधारक किसान परिवार।"
+    },
+    "link": "https://nsmny.mahait.org/",
+    "states": ["Maharashtra"]
+  }
+]

@@ -845,3 +845,186 @@ input, select, textarea { font-family: var(--font-main); }
 .farmer-metric-icon { font-size: 22px; flex-shrink: 0; }
 .farmer-metric-label { font-size: 11px; color: #6b7280; font-weight: 500; }
 .farmer-metric-value { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+
+/* ── Voice Assistant ─────────────────────────────────────────── */
+.voice-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gov-navy) 0%, var(--gov-navy-light) 100%);
+  color: white;
+  border: none;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 51, 102, 0.35);
+  z-index: 1000;
+  transition: all 0.25s ease;
+}
+.voice-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(0, 51, 102, 0.5);
+}
+
+.voice-panel {
+  position: fixed;
+  bottom: 96px;
+  right: 28px;
+  width: 340px;
+  max-height: 480px;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  z-index: 1001;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.voice-panel-header {
+  background: var(--gov-navy);
+  color: white;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.voice-panel-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.voice-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.voice-close:hover { background: rgba(255,255,255,0.3); }
+
+.voice-panel-body {
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+/* Animated Mic Indicator */
+.voice-indicator {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.voice-mic-icon { font-size: 36px; z-index: 2; }
+.voice-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--gov-navy);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.voice-indicator.active .voice-ring {
+  opacity: 0.4;
+  animation: voicePulse 1.4s ease-out infinite;
+}
+.voice-indicator.active .voice-ring.delay {
+  animation-delay: 0.4s;
+}
+@keyframes voicePulse {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.voice-transcript {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gov-navy);
+  text-align: center;
+  font-style: italic;
+  padding: 6px 14px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  width: 100%;
+  word-break: break-word;
+}
+
+.voice-feedback {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+  padding: 6px 10px;
+}
+
+.voice-hints {
+  width: 100%;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.voice-hint-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 6px;
+}
+.voice-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #f0f4ff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  font-size: 11px;
+  color: var(--gov-navy);
+  cursor: pointer;
+  transition: all 0.18s;
+  font-weight: 500;
+}
+.voice-chip:hover {
+  background: var(--gov-navy);
+  color: white;
+  border-color: var(--gov-navy);
+}
+
+@media (max-width: 500px) {
+  .voice-panel {
+    right: 10px;
+    left: 10px;
+    width: auto;
+    bottom: 90px;
+  }
+  .voice-fab {
+    bottom: 18px;
+    right: 18px;
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+  }
+}

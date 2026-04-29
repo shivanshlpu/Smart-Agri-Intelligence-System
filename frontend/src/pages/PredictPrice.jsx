@@ -46,7 +46,7 @@ export default function PredictPrice() {
         state:         form.state,
         month:         Number(form.month),
         year:          Number(form.year),
-        min_price:     0,  // Auto-filled by ML server from historical data
+        min_price:     0,
         max_price:     0,
         demand_index:  50,
         supply_index:  50,
@@ -145,6 +145,10 @@ export default function PredictPrice() {
                 cropName={form.crop_type}
                 season={form.season}
                 state={form.state}
+                bestMonth={result.best_month}
+                bestPrice={result.best_price}
+                currentMonth={Number(form.month)}
+                msp={result.msp}
               />
 
               {result.note && (
@@ -157,7 +161,14 @@ export default function PredictPrice() {
                 title="rec.marketAdvisory"
               />
 
-              <PriceChart crop={form.crop_type} state={form.state} />
+              <PriceChart
+                crop={form.crop_type}
+                state={form.state}
+                monthlyPrices={result.monthly_prices}
+                bestMonth={result.best_month}
+                currentMonth={Number(form.month)}
+                msp={result.msp}
+              />
             </div>
           )}
         </div>

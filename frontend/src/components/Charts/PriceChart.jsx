@@ -1,142 +1,193 @@
 import { useEffect, useState } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  ReferenceLine, Cell, Legend
 } from "recharts";
 import { useLang } from "../../context/LanguageContext";
 
-export default function PriceChart({ crop, state }) {
-  const { t } = useLang();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [livePrice, setLivePrice] = useState(null);
-  const [error, setError] = useState(null);
+const MONTH_SHORT_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTH_SHORT_HI = ["जन","फर","मार्च","अप्रै","मई","जून","जुला","अग","सित","अक्टू","नव","दिस"];
+
+export default function PriceChart({ crop, state, monthlyPrices, bestMonth, currentMonth, msp }) {
+  const { t, lang } = useLang();
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    if (!crop || !state) return;
+    if (monthlyPrices && monthlyPrices.length > 0) {
+      // Use ML-predicted monthly data
+      const data = monthlyPrices.map((mp) => ({
+        month: mp.month,
+        label: lang === "hi" ? MONTH_SHORT_HI[mp.month - 1] : MONTH_SHORT_EN[mp.month - 1],
+        price: Math.round(mp.price),
+        isCurrent: mp.month === currentMonth,
+        isBest: mp.month === bestMonth,
+      }));
+      setChartData(data);
+    } else {
+      // Fallback: generate estimated trend
+      generateFallbackData();
+    }
+  }, [monthlyPrices, bestMonth, currentMonth, crop, state, lang]);
 
-    const fetchMandiData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const apiKey = import.meta.env.VITE_DATA_GOV_API_KEY;
-        const baseUrl = import.meta.env.VITE_DATA_GOV_MANDI_URL;
-        
-        if (!apiKey || !baseUrl || apiKey.includes("your_api_key")) {
-          throw new Error("API Key not configured");
-        }
-
-        // Add filters for commodity and state
-        const url = `${baseUrl}?api-key=${apiKey}&format=json&filters[commodity]=${crop}&filters[state]=${state}&limit=30`;
-        const res = await fetch(url);
-        
-        if (!res.ok) throw new Error("Failed to fetch mandi data");
-        const json = await res.json();
-        
-        if (json.records && json.records.length > 0) {
-          // Process and sort by date
-          const processed = json.records.map(r => {
-            // Convert DD/MM/YYYY to a sortable date
-            const [day, month, year] = (r.Arrival_Date || "").split("/");
-            const dateObj = new Date(`${year}-${month}-${day}`);
-            
-            return {
-              dateObj,
-              date: dateObj.toLocaleDateString("en-IN", { day: '2-digit', month: 'short' }),
-              price: parseFloat(r.Modal_Price || r.Max_Price),
-              market: r.Market
-            };
-          }).filter(r => !isNaN(r.price));
-          
-          // Sort oldest to newest for chart
-          processed.sort((a, b) => a.dateObj - b.dateObj);
-          
-          setData(processed);
-          // Set latest price
-          if (processed.length > 0) {
-            setLivePrice(processed[processed.length - 1].price);
-          }
-        } else {
-          // If no exact match, fallback to some mock trend for visual completeness as per requirements
-          throw new Error("No records found for this crop/state");
-        }
-      } catch (err) {
-        console.warn("Mandi API fetch error:", err);
-        // Fallback mock data if API fails or no data (so graph still shows as promised)
-        generateMockData();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMandiData();
-  }, [crop, state]);
-
-  const generateMockData = () => {
-    const mock = [];
+  const generateFallbackData = () => {
     const base = 2000 + Math.random() * 1000;
-    for (let i = 30; i > 0; i -= 3) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      mock.push({
-        date: d.toLocaleDateString("en-IN", { day: '2-digit', month: 'short' }),
-        price: Math.round(base + (Math.random() * 400 - 200)),
-        market: "Mock Mandi"
+    const data = [];
+    const cm = currentMonth || (new Date().getMonth() + 1);
+    for (let m = 1; m <= 12; m++) {
+      const seasonal = Math.sin(((m - 3) / 12) * Math.PI * 2) * 300;
+      data.push({
+        month: m,
+        label: lang === "hi" ? MONTH_SHORT_HI[m - 1] : MONTH_SHORT_EN[m - 1],
+        price: Math.round(base + seasonal + (Math.random() * 200 - 100)),
+        isCurrent: m === cm,
+        isBest: false,
       });
     }
-    setData(mock);
-    setLivePrice(mock[mock.length - 1].price);
-    setError(t("price.apiFallback"));
+    // Mark the best month
+    const maxPrice = Math.max(...data.map(d => d.price));
+    data.forEach(d => { if (d.price === maxPrice) d.isBest = true; });
+    setChartData(data);
   };
 
-  if (loading) {
+  const getBarColor = (entry) => {
+    if (entry.isBest) return "#059669";     // Green for best month
+    if (entry.isCurrent) return "#2563eb";  // Blue for current month
+    return "#94a3b8";                        // Gray for others
+  };
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (!active || !payload?.length) return null;
+    const d = payload[0].payload;
     return (
-      <div className="card" style={{ padding: "40px 20px", textAlign: "center" }}>
-        <div className="spinner" style={{ margin: "0 auto" }}></div>
-        <p style={{ marginTop: 10, color: "#6b7280" }}>{t("price.fetchingLive") || "Fetching live mandi prices..."}</p>
+      <div style={{
+        background: "#fff", padding: "12px 16px", borderRadius: 12,
+        boxShadow: "0 8px 24px rgba(0,0,0,0.15)", border: "none",
+        minWidth: 180
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, color: "#1e293b" }}>
+          {lang === "hi" ? MONTH_SHORT_HI[d.month - 1] : MONTH_SHORT_EN[d.month - 1]} 
+          {d.isCurrent ? (lang === "hi" ? " (अभी)" : " (Now)") : ""}
+          {d.isBest ? (lang === "hi" ? " ⭐ सर्वोत्तम" : " ⭐ Best") : ""}
+        </div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: d.isBest ? "#059669" : "#2563eb" }}>
+          ₹{d.price.toLocaleString("en-IN")}
+          <span style={{ fontSize: 11, fontWeight: 400, color: "#6b7280" }}>
+            /{lang === "hi" ? "क्विंटल" : "Qtl"}
+          </span>
+        </div>
+        {d.isBest && (
+          <div style={{ marginTop: 6, fontSize: 12, color: "#059669", fontWeight: 600 }}>
+            {lang === "hi" ? "✅ इस महीने बेचें — सबसे ज़्यादा भाव!" : "✅ Sell this month — highest price!"}
+          </div>
+        )}
+        {d.isCurrent && !d.isBest && (
+          <div style={{ marginTop: 6, fontSize: 12, color: "#f59e0b", fontWeight: 600 }}>
+            {lang === "hi" ? "⏳ रुकें — बेहतर भाव आएगा" : "⏳ Hold — better price coming"}
+          </div>
+        )}
       </div>
     );
-  }
+  };
+
+  if (!chartData.length) return null;
+
+  const maxPrice = Math.max(...chartData.map(d => d.price));
+  const minPrice = Math.min(...chartData.map(d => d.price));
 
   return (
     <div className="card" style={{ marginTop: 20 }}>
-      <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h3 style={{ margin: 0 }}>📈 {t("price.trendTitle") || "30-Day Market Trend"}</h3>
-        {livePrice && (
-          <div style={{ background: "#dbeafe", color: "#1e40af", padding: "4px 12px", borderRadius: 20, fontSize: 13, fontWeight: "bold" }}>
-            {t("price.liveMandi") || "Live Mandi"}: ₹{livePrice.toLocaleString("en-IN")}/Qtl
+      <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        <h3 style={{ margin: 0 }}>
+          📊 {lang === "hi" ? "12-महीने का मूल्य पूर्वानुमान" : "12-Month Price Forecast"}
+        </h3>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
+            <span style={{ width: 12, height: 12, borderRadius: 3, background: "#2563eb", display: "inline-block" }}></span>
+            {lang === "hi" ? "अभी का महीना" : "Current Month"}
           </div>
-        )}
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
+            <span style={{ width: 12, height: 12, borderRadius: 3, background: "#059669", display: "inline-block" }}></span>
+            {lang === "hi" ? "⭐ बेचने का सबसे अच्छा महीना" : "⭐ Best Month to Sell"}
+          </div>
+          {msp && (
+            <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
+              <span style={{ width: 16, height: 2, background: "#dc2626", display: "inline-block" }}></span>
+              MSP ₹{msp.toLocaleString("en-IN")}
+            </div>
+          )}
+        </div>
       </div>
-      
+
       <div className="card-body">
-        {error && (
+        {!monthlyPrices && (
           <div className="alert alert-warning" style={{ fontSize: 12, marginBottom: 16 }}>
-            {error}
+            {lang === "hi" ? "ML मॉडल से डेटा उपलब्ध नहीं। अनुमानित ट्रेंड दिखाया जा रहा है।"
+              : "ML model data unavailable. Showing estimated trend."}
           </div>
         )}
-        
-        <div style={{ height: 250, width: "100%" }}>
+
+        <div style={{ height: 300, width: "100%" }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
-              <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                formatter={(value) => [`₹${value}`, 'Price']}
-                labelStyle={{ fontWeight: 'bold', color: '#374151' }}
+              <XAxis
+                dataKey="label"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 11, fill: '#6b7280', fontWeight: 600 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="price" 
-                stroke="#0ea5e9" 
-                strokeWidth={3}
-                dot={{ r: 4, strokeWidth: 2 }}
-                activeDot={{ r: 6, fill: "#0284c7" }} 
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: '#6b7280' }}
+                tickFormatter={(v) => `₹${(v/1000).toFixed(1)}k`}
+                domain={[Math.floor(minPrice * 0.85), Math.ceil(maxPrice * 1.1)]}
               />
-            </LineChart>
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
+              {msp && (
+                <ReferenceLine
+                  y={msp}
+                  stroke="#dc2626"
+                  strokeDasharray="6 4"
+                  strokeWidth={2}
+                  label={{
+                    value: `MSP ₹${msp.toLocaleString("en-IN")}`,
+                    position: "right",
+                    fill: "#dc2626",
+                    fontSize: 10,
+                    fontWeight: 700
+                  }}
+                />
+              )}
+              <Bar dataKey="price" radius={[6, 6, 0, 0]} maxBarSize={40}>
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={getBarColor(entry)}
+                    stroke={entry.isBest ? "#047857" : entry.isCurrent ? "#1d4ed8" : "transparent"}
+                    strokeWidth={entry.isBest || entry.isCurrent ? 2 : 0}
+                    opacity={entry.isBest || entry.isCurrent ? 1 : 0.65}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Best month summary below chart */}
+        {bestMonth && (
+          <div style={{
+            marginTop: 16, padding: "14px 18px", borderRadius: 12,
+            background: "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)",
+            border: "1px solid #6ee7b7", textAlign: "center"
+          }}>
+            <div style={{ fontSize: 13, color: "#065f46", fontWeight: 700 }}>
+              {lang === "hi"
+                ? `⭐ सर्वोत्तम बिक्री समय: ${MONTH_SHORT_HI[bestMonth - 1]} — अनुमानित भाव ₹${maxPrice.toLocaleString("en-IN")}/क्विंटल`
+                : `⭐ Best Time to Sell: ${MONTH_SHORT_EN[bestMonth - 1]} — Est. Price ₹${maxPrice.toLocaleString("en-IN")}/Qtl`}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

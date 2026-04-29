@@ -137,8 +137,7 @@ def preprocess_price(data: dict) -> np.ndarray:
     avg_production = float(data.get("avg_production", data.get("supply_index", 50)) or 50)
     price_spread   = max(max_price - min_price, 0)  # Never negative
 
-    features = [crop_enc, state_enc, season_enc, month, year,
-                min_price, max_price, avg_production, price_spread]
+    features = [crop_enc, state_enc, season_enc, month, year, avg_production]
 
     expected = len(price_feature_cols) if price_feature_cols else 9
     features = features[:expected]

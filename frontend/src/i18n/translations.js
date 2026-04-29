@@ -200,6 +200,7 @@ const translations = {
   "history.recs":        { en: "Recommendations",             hi: "सलाह" },
   "history.action":      { en: "Action",                      hi: "कार्रवाई" },
   "history.deleteConfirm": { en: "Delete this prediction record?", hi: "यह पूर्वानुमान रिकॉर्ड हटाएं?" },
+  "history.bulkDeleteConfirm": { en: "Delete {count} selected record(s)?", hi: "{count} चयनित रिकॉर्ड हटाएं?" },
 
   // ─── Profile ──────────────────────────────────────────────
   "profile.title":       { en: "👤 My Profile",                hi: "👤 मेरी प्रोफ़ाइल" },
@@ -214,9 +215,78 @@ const translations = {
 
   // ─── Recommendations (bilingual) ──────────────────────────
   "rec.title":           { en: "💡 Recommendations",           hi: "💡 सलाह और सुझाव" },
-  "rec.marketAdvisory":  { en: "💡 Market Advisory",           hi: "💡 बाज़ार सलाह" },
-  "rec.supplyAdvisory":  { en: "💡 Supply Chain Advisory",     hi: "💡 आपूर्ति श्रृंखला सलाह" },
-  "rec.govActions":      { en: "💡 Government-Recommended Actions", hi: "💡 सरकार द्वारा सुझाई गई कार्रवाई" },
+  "rec.marketAdvisory":  { en: "💡 Market Advisory / बाज़ार सलाह",  hi: "💡 बाज़ार सलाह / Market Advisory" },
+  "rec.supplyAdvisory":  { en: "💡 Supply Chain Advisory / आपूर्ति श्रृंखला सलाह", hi: "💡 आपूर्ति श्रृंखला सलाह / Supply Chain Advisory" },
+  "rec.govActions":      { en: "💡 Government-Recommended Actions / सरकार द्वारा सुझाई गई कार्रवाई", hi: "💡 सरकार द्वारा सुझाई गई कार्रवाई / Government-Recommended Actions" },
+
+  // ─── Price Chart / Monthly Forecast ────────────────────────
+  "price.monthlyForecast": { en: "12-Month Price Forecast", hi: "12-महीने का मूल्य पूर्वानुमान" },
+  "price.currentMonth":   { en: "Current Month",            hi: "अभी का महीना" },
+  "price.bestMonth":      { en: "Best Month to Sell",       hi: "बेचने का सबसे अच्छा महीना" },
+  "price.mspLine":        { en: "MSP Line",                 hi: "MSP रेखा" },
+  "price.dontSell":       { en: "DON'T Sell Now!",          hi: "अभी न बेचें!" },
+  "price.sellTime":       { en: "Good Time to Sell Now!",   hi: "अभी बेचने का सही समय!" },
+  "price.aboveMsp":       { en: "Above MSP",                hi: "MSP से ज़्यादा" },
+  "price.belowMsp":       { en: "Below MSP — sell via govt procurement", hi: "MSP से कम — सरकारी खरीद पर बेचें" },
+
+  // ─── Supply Cost Comparison ────────────────────────────────
+  "supply.yourCost":      { en: "Your Cost",                hi: "आपकी लागत" },
+  "supply.avgCost":       { en: "National Average",         hi: "राष्ट्रीय औसत" },
+  "supply.tooHigh":       { en: "Too High",                 hi: "बहुत ज़्यादा" },
+  "supply.costOk":        { en: "OK",                       hi: "ठीक" },
+  "supply.costGood":      { en: "Good",                     hi: "अच्छा" },
+
+  // ─── Navigation — Services ─────────────────────────────────
+  "nav.services":         { en: "Services",                   hi: "सेवाएँ" },
+  "nav.schemes":          { en: "Government Schemes",         hi: "सरकारी योजनाएँ" },
+
+  // ─── Government Schemes Page ───────────────────────────────
+  "schemes.title":        { en: "🏛️ Government Schemes & Subsidies", hi: "🏛️ सरकारी योजनाएँ और सब्सिडी" },
+  "schemes.subtitle":     { en: "Discover schemes you are eligible for and apply directly.", hi: "अपने लिए उपलब्ध योजनाएँ खोजें और सीधे आवेदन करें।" },
+  "schemes.totalSchemes": { en: "Total Schemes",              hi: "कुल योजनाएँ" },
+  "schemes.availableForYou": { en: "Available for you",       hi: "आपके लिए उपलब्ध" },
+  "schemes.centralSchemes": { en: "Central Schemes",          hi: "केंद्रीय योजनाएँ" },
+  "schemes.govOfIndia":   { en: "Government of India",        hi: "भारत सरकार" },
+  "schemes.stateSchemes": { en: "State Schemes",              hi: "राज्य योजनाएँ" },
+  "schemes.yourState":    { en: "Your State",                 hi: "आपका राज्य" },
+  "schemes.noSchemes":    { en: "No schemes found for this category.", hi: "इस श्रेणी के लिए कोई योजना नहीं मिली।" },
+  "schemes.benefits":     { en: "Key Benefits",               hi: "मुख्य लाभ" },
+  "schemes.eligibility":  { en: "Eligibility",                hi: "पात्रता" },
+  "schemes.applyNow":     { en: "Apply Online →",             hi: "ऑनलाइन आवेदन करें →" },
+  "schemes.disclaimer":   { en: "Information sourced from official government portals. Verify eligibility on the respective scheme website before applying.", hi: "जानकारी आधिकारिक सरकारी पोर्टल से ली गई है। आवेदन करने से पहले संबंधित योजना वेबसाइट पर पात्रता सत्यापित करें।" },
+
+  // ─── Voice Assistant ───────────────────────────────────────
+  "voice.title":          { en: "🎙️ Voice Assistant", hi: "🎙️ आवाज़ सहायक" },
+  "voice.tryTitle":       { en: "Try saying:", hi: "बोलकर देखें:" },
+
+  // ─── Navigation — Soil ─────────────────────────────────────
+  "nav.soil":             { en: "Soil Health", hi: "मिट्टी स्वास्थ्य" },
+
+  // ─── Soil Health Page ──────────────────────────────────────
+  "soil.title":           { en: "🧪 Soil Health & Fertilizer Guide", hi: "🧪 मिट्टी स्वास्थ्य और उर्वरक गाइड" },
+  "soil.subtitle":        { en: "Enter your soil test results to get crop & fertilizer recommendations.", hi: "फसल और उर्वरक सुझाव पाने के लिए अपनी मिट्टी की जांच रिपोर्ट भरें।" },
+  "soil.formTitle":       { en: "📋 Soil Test Data", hi: "📋 मिट्टी परीक्षण डेटा" },
+  "soil.nitrogen":        { en: "Nitrogen (N) kg/ha", hi: "नाइट्रोजन (N) kg/ha" },
+  "soil.nitrogenHint":    { en: "Ideal: 80-120 kg/ha", hi: "आदर्श: 80-120 kg/ha" },
+  "soil.phosphorus":      { en: "Phosphorus (P) kg/ha", hi: "फॉस्फोरस (P) kg/ha" },
+  "soil.phosphorusHint":  { en: "Ideal: 30-60 kg/ha", hi: "आदर्श: 30-60 kg/ha" },
+  "soil.potassium":       { en: "Potassium (K) kg/ha", hi: "पोटैशियम (K) kg/ha" },
+  "soil.potassiumHint":   { en: "Ideal: 40-80 kg/ha", hi: "आदर्श: 40-80 kg/ha" },
+  "soil.ph":              { en: "Soil pH", hi: "मिट्टी pH" },
+  "soil.phHint":          { en: "Ideal: 6.0 - 7.5", hi: "आदर्श: 6.0 - 7.5" },
+  "soil.analyzeBtn":      { en: "🔍 Analyze Soil Health", hi: "🔍 मिट्टी स्वास्थ्य जाँचें" },
+  "soil.analyzing":       { en: "Analyzing...", hi: "विश्लेषण हो रहा है..." },
+  "soil.emptyState":      { en: "Enter your soil test values and click Analyze.", hi: "मिट्टी परीक्षण मान भरें और विश्लेषण करें बटन दबाएं।" },
+  "soil.loadingText":     { en: "Analyzing your soil data...", hi: "आपकी मिट्टी डेटा का विश्लेषण हो रहा है..." },
+  "soil.healthLabel":     { en: "Soil Health", hi: "मिट्टी स्वास्थ्य" },
+  "soil.issuesTitle":     { en: "🔎 Soil Analysis Report", hi: "🔎 मिट्टी विश्लेषण रिपोर्ट" },
+  "soil.bestCrops":       { en: "🌾 Best Crops for Your Soil", hi: "🌾 आपकी मिट्टी के लिए सर्वोत्तम फसलें" },
+  "soil.cropName":        { en: "Crop", hi: "फसल" },
+  "soil.suitability":     { en: "Suitability", hi: "उपयुक्तता" },
+  "soil.season":          { en: "Season", hi: "ऋतु" },
+  "soil.idealPh":         { en: "Ideal pH", hi: "आदर्श pH" },
+  "soil.fertTitle":       { en: "💊 Fertilizer Recommendations / उर्वरक सुझाव", hi: "💊 उर्वरक सुझाव / Fertilizer Recommendations" },
+  "soil.infoBox":         { en: "💡 Get your soil tested at any Krishi Vigyan Kendra (KVK) or Soil Health Card centre for free. Enter the N, P, K values from your soil health card.", hi: "💡 अपनी मिट्टी की जांच किसी भी कृषि विज्ञान केंद्र (KVK) या मृदा स्वास्थ्य कार्ड केंद्र पर मुफ्त करवाएं। अपने मृदा स्वास्थ्य कार्ड से N, P, K मान भरें।" },
 };
 
 export default translations;

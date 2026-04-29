@@ -149,6 +149,8 @@ export default function SupplyChain() {
                 efficiency={result.efficiency}
                 cluster={result.cluster}
                 inputData={form}
+                costPerKm={result.cost_per_km}
+                avgCostPerKm={result.avg_cost_per_km}
               />
 
               {result.note && (
